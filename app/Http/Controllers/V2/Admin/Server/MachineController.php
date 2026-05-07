@@ -202,14 +202,14 @@ class MachineController extends Controller
     private function buildInstallCommand(Request $request, ServerMachine $machine): string
     {
         $panelUrl = rtrim((string) (admin_setting('app_url') ?: $request->getSchemeAndHttpHost()), '/');
-        $installerUrl = 'https://raw.githubusercontent.com/onesyue/Xboard-Node/master/install.sh';
+        $image = 'ghcr.io/onesyue/xboard-node:latest';
 
         return sprintf(
-            'curl -fsSL %s | sudo bash -s -- --mode machine --panel %s --token %s --machine-id %d',
-            $installerUrl,
+            'sudo mkdir -p /etc/xboard-node && (sudo docker rm -f xboard-node >/dev/null 2>&1 || true) && sudo docker run -d --pull=always --name xboard-node --restart=always --network=host -v /etc/xboard-node:/etc/xboard-node -e API_HOST=%s -e MACHINE_ID=%d -e MACHINE_TOKEN=%s -e KERNEL_TYPE=singbox %s',
             escapeshellarg($panelUrl),
+            $machine->id,
             escapeshellarg($machine->token),
-            $machine->id
+            escapeshellarg($image)
         );
     }
 }
