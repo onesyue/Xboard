@@ -260,6 +260,7 @@ class ClashMeta extends AbstractProtocol
         $array = [];
         $array['name'] = $server['name'];
         $array['type'] = 'ss';
+        $array['xb_server_id'] = (int)($server['id'] ?? 0);
         $array['server'] = $server['host'];
         $array['port'] = $server['port'];
         $array['cipher'] = data_get($server['protocol_settings'], 'cipher');
@@ -333,6 +334,7 @@ class ClashMeta extends AbstractProtocol
         $array = [
             'name' => $server['name'],
             'type' => 'vmess',
+            'xb_server_id' => (int)($server['id'] ?? 0),
             'server' => $server['host'],
             'port' => $server['port'],
             'uuid' => $uuid,
@@ -407,6 +409,7 @@ class ClashMeta extends AbstractProtocol
         $array = [
             'name' => $server['name'],
             'type' => 'vless',
+            'xb_server_id' => (int)($server['id'] ?? 0),
             'server' => $server['host'],
             'port' => $server['port'],
             'uuid' => $password,
@@ -516,6 +519,7 @@ class ClashMeta extends AbstractProtocol
         $array = [
             'name' => $server['name'],
             'type' => 'trojan',
+            'xb_server_id' => (int)($server['id'] ?? 0),
             'server' => $server['host'],
             'port' => $server['port'],
             'password' => $password,
@@ -591,6 +595,7 @@ class ClashMeta extends AbstractProtocol
         $protocol_settings = data_get($server, 'protocol_settings', []);
         $array = [
             'name' => $server['name'],
+            'xb_server_id' => (int)($server['id'] ?? 0),
             'server' => $server['host'],
             'port' => $server['port'],
             'sni' => data_get($protocol_settings, 'tls.server_name'),
@@ -634,6 +639,7 @@ class ClashMeta extends AbstractProtocol
         $array = [
             'name' => $server['name'],
             'type' => 'tuic',
+            'xb_server_id' => (int)($server['id'] ?? 0),
             'server' => $server['host'],
             'port' => $server['port'],
             'udp' => true,

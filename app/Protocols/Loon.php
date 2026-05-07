@@ -352,6 +352,9 @@ class Loon extends AbstractProtocol
         ];
         if (data_get($protocol_settings, 'tls.allow_insecure'))
             $config[] = "skip-cert-verify=true";
+        if ($up = data_get($protocol_settings, 'bandwidth.up')) {
+            $config[] = "upload-bandwidth={$up}";
+        }
         if ($down = data_get($protocol_settings, 'bandwidth.down')) {
             $config[] = "download-bandwidth={$down}";
         }

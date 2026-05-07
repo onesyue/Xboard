@@ -32,7 +32,8 @@ class InviteController extends Controller
         $pageSize = $request->input('page_size') >= 10 ? $request->input('page_size') : 10;
         $builder = CommissionLog::where('invite_user_id', $request->user()->id)
             ->where('get_amount', '>', 0)
-            ->orderBy('created_at', 'DESC');
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('id', 'DESC');
         $total = $builder->count();
         $details = $builder->forPage($current, $pageSize)
             ->get();
@@ -49,6 +50,9 @@ class InviteController extends Controller
                 ->load(['codes' => fn($query) => $query->where('status', 0)]);
         if ($user->commission_rate) {
             $commission_rate = $user->commission_rate;
+        } else {
+            // [Patch CT Rate] CommissionTier filter — VIP tier 动态覆盖默认 invite_commission
+            $commission_rate = (int) \App\Services\Plugin\HookManager::filter('user.invite.commission_rate', $commission_rate, $user);
         }
         $uncheck_commission_balance = (int)Order::where('status', 3)
             ->where('commission_status', 0)
@@ -74,6 +78,8 @@ class InviteController extends Controller
             'codes' => InviteCodeResource::collection($user->codes),
             'stat' => $stat
         ];
+        // [Patch CT Response] CommissionTier enriches native invite response with tier details
+        $data = \App\Services\Plugin\HookManager::filter('user.invite.fetch.response', $data, $user);
         return $this->success($data);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -47,7 +48,7 @@ class TrafficResetController extends Controller
 
     if ($request->filled('user_email')) {
       $query->whereHas('user', function ($query) use ($request) {
-        $query->where('email', 'like', '%' . $request->user_email . '%');
+        $query->where('email', 'ilike', '%' . $request->user_email . '%');
       });
     }
 

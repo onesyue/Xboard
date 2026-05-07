@@ -71,7 +71,7 @@ class Plugin extends AbstractPlugin
       return;
     }
 
-    $message = $ticket->messages()->latest()->first();
+    $message = $ticket->messages()->reorder('id', 'desc')->first();
     $user = User::find($ticket->user_id);
     if (!$user)
       return;

@@ -28,7 +28,8 @@ class UserObserver
     }
 
     if ($needsSync) {
-      NodeUserSyncJob::dispatch($user->id, 'updated', $oldGroupId);
+      $uuidChanged = $user->isDirty('uuid') || $user->wasChanged('uuid');
+      NodeUserSyncJob::dispatch($user->id, 'updated', $oldGroupId, $uuidChanged);
     }
   }
 

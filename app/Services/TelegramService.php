@@ -116,7 +116,7 @@ class TelegramService
     {
         $query = User::where('telegram_id', '!=', null);
         $query->where(
-            fn($q) => $q->where('is_admin', 1)
+            fn($q) => $q->where('is_admin', true)
                 ->when($isStaff, fn($q) => $q->orWhere('is_staff', 1))
         );
         $users = $query->get();

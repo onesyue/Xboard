@@ -109,6 +109,7 @@ class GiftCardController extends Controller
         $usages = GiftCardUsage::with(['template', 'code'])
             ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage);
 
         $data = $usages->getCollection()->map(function (GiftCardUsage $usage) {

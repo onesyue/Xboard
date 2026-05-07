@@ -12,6 +12,7 @@ class Notice extends Model
     protected $casts = [
         'created_at' => 'timestamp',
         'updated_at' => 'timestamp',
+        'sort' => 'integer',
         'tags' => 'array',
         'show' => 'boolean',
     ];

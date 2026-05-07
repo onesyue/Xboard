@@ -28,9 +28,11 @@ class StatController extends Controller
             return !!$server->is_online;
         })->count();
         // 获取在线设备数和在线用户数
-        $onlineDevices = User::where('t', '>=', time() - 600)
+        $onlineDevices = User::where('last_online_at', '>=', now()->subMinutes(10))
+            ->where('online_count', '>', 0)
             ->sum('online_count');
-        $onlineUsers = User::where('t', '>=', time() - 600)
+        $onlineUsers = User::where('last_online_at', '>=', now()->subMinutes(10))
+            ->where('online_count', '>', 0)
             ->count();
 
         // 获取今日流量统计
@@ -271,9 +273,11 @@ class StatController extends Controller
         })->count();
 
         // 获取在线设备数和在线用户数
-        $onlineDevices = User::where('t', '>=', time() - 600)
+        $onlineDevices = User::where('last_online_at', '>=', now()->subMinutes(10))
+            ->where('online_count', '>', 0)
             ->sum('online_count');
-        $onlineUsers = User::where('t', '>=', time() - 600)
+        $onlineUsers = User::where('last_online_at', '>=', now()->subMinutes(10))
+            ->where('online_count', '>', 0)
             ->count();
 
         // 获取今日流量统计
@@ -448,6 +452,7 @@ class StatController extends Controller
                 ->where('record_at', '<=', $endDate)
                 ->groupBy('server_id')
                 ->orderBy('value', 'DESC')
+                ->orderBy('server_id', 'DESC')
                 ->limit(10)
                 ->get();
 
@@ -467,6 +472,7 @@ class StatController extends Controller
                 ->where('record_at', '<=', $endDate)
                 ->groupBy('user_id')
                 ->orderBy('value', 'DESC')
+                ->orderBy('user_id', 'DESC')
                 ->limit(10)
                 ->get();
 

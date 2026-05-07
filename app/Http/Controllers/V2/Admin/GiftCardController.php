@@ -38,6 +38,7 @@ class GiftCardController extends Controller
         $perPage = $request->input('per_page', 15);
         $templates = $query->orderBy('sort', 'asc')
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage);
 
         $data = $templates->getCollection()->map(function ($template) {
@@ -362,7 +363,7 @@ class GiftCardController extends Controller
         }
 
         $perPage = $request->input('per_page', 15);
-        $codes = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $codes = $query->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate($perPage);
 
         $data = $codes->getCollection()->map(function ($code) {
             return [
@@ -430,6 +431,7 @@ class GiftCardController extends Controller
 
         $codes = GiftCardCode::where('batch_id', $request->input('batch_id'))
             ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get(['code']);
 
         $content = $codes->pluck('code')->implode("\n");
@@ -462,7 +464,7 @@ class GiftCardController extends Controller
         }
 
         $perPage = $request->input('per_page', 15);
-        $usages = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $usages = $query->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate($perPage);
 
         $usages->transform(function ($usage) {
             return [

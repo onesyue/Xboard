@@ -16,9 +16,7 @@ class CouponService
 
     public function __construct($code)
     {
-        $this->coupon = Coupon::where('code', $code)
-            ->lockForUpdate()
-            ->first();
+        $this->coupon = Coupon::where('code', $code)->first();
     }
 
     public function use(Order $order): bool

@@ -11,6 +11,8 @@ class InviteCode extends Model
     protected $casts = [
         'created_at' => 'timestamp',
         'updated_at' => 'timestamp',
+        'user_id' => 'integer',
+        'pv' => 'integer',
         'status' => 'boolean',
     ];
 

@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -109,8 +110,8 @@ class SystemController extends Controller
             ->when($request->input('admin_id'), fn($q, $v) => $q->where('admin_id', $v))
             ->when($request->input('keyword'), function ($q, $keyword) {
                 $q->where(function ($q) use ($keyword) {
-                    $q->where('uri', 'like', '%' . $keyword . '%')
-                      ->orWhere('request_data', 'like', '%' . $keyword . '%');
+                    $q->where('uri', 'ilike', '%' . $keyword . '%')
+                      ->orWhere('request_data', 'ilike', '%' . $keyword . '%');
                 });
             });
 

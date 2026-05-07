@@ -47,8 +47,18 @@ class BackupDatabase extends Command
                     ->setDbName(config('database.connections.sqlite.database'))
                     ->dumpToFile($databaseBackupPath);
                 $this->info("2️⃣：Sqlite备份完成");
+            }elseif(config('database.default') === 'pgsql'){
+                $dbConfig = config('database.connections.pgsql');
+                $databaseBackupPath = storage_path('backup/' . now()->format('Y-m-d_H-i-s') . '_' . $dbConfig['database'] . '_database_backup.sql');
+                $this->info("1️⃣：开始备份PostgreSQL");
+                $env = ['PGPASSWORD' => $dbConfig['password']];
+                $cmd = new Process(['pg_dump', '-h', $dbConfig['host'], '-p', (string) $dbConfig['port'], '-U', $dbConfig['username'], '-Fc', $dbConfig['database'], '-f', $databaseBackupPath], null, $env);
+                $cmd->setTimeout(600);
+                $cmd->run();
+                if (!$cmd->isSuccessful()) { $this->error('PG备份失败: ' . $cmd->getErrorOutput()); return; }
+                $this->info("2️⃣：PostgreSQL备份完成");
             }else{
-                $this->error('备份失败，你的数据库不是sqlite或者mysql');
+                $this->error('备份失败，你的数据库不是sqlite、pgsql或者mysql');
                 return;
             }
             $this->info('3️⃣：开始压缩备份文件');

@@ -33,7 +33,7 @@ class ServerV2
             'token' => [
                 'string', 'required',
                 function ($attribute, $value, $fail) {
-                    if ($value !== admin_setting('server_token')) {
+                    if (!hash_equals((string) admin_setting('server_token'), (string) $value)) {
                         $fail("Invalid {$attribute}");
                     }
                 },

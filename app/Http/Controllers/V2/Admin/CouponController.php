@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -13,17 +14,19 @@ use Illuminate\Support\Facades\DB;
 
 class CouponController extends Controller
 {
+    use \App\Traits\QueryOperators;
     private function applyFiltersAndSorts(Request $request, $builder)
     {
         if ($request->has('filter')) {
             collect($request->input('filter'))->each(function ($filter) use ($builder) {
                 $key = $filter['id'];
+                if (!$this->isValidFieldName($key)) return;
                 $value = $filter['value'];
                 $builder->where(function ($query) use ($key, $value) {
                     if (is_array($value)) {
                         $query->whereIn($key, $value);
                     } else {
-                        $query->where($key, 'like', "%{$value}%");
+                        $query->where($key, 'ilike', "%{$value}%");
                     }
                 });
             });
@@ -32,6 +35,7 @@ class CouponController extends Controller
         if ($request->has('sort')) {
             collect($request->input('sort'))->each(function ($sort) use ($builder) {
                 $key = $sort['id'];
+                if (!$this->isValidFieldName($key)) return;
                 $value = $sort['desc'] ? 'DESC' : 'ASC';
                 $builder->orderBy($key, $value);
             });
@@ -45,6 +49,7 @@ class CouponController extends Controller
         $this->applyFiltersAndSorts($request, $builder);
         $coupons = $builder
             ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($pageSize, ["*"], 'page', $current);
         return $this->paginate($coupons);
     }

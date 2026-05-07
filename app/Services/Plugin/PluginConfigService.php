@@ -66,7 +66,7 @@ class PluginConfigService
         Plugin::query()
             ->where('code', $pluginCode)
             ->update([
-                'config' => json_encode($values),
+                'config' => $values,
                 'updated_at' => now()
             ]);
 
@@ -106,6 +106,7 @@ class PluginConfigService
             return [];
         }
 
-        return json_decode($plugin->config, true);
+        $config = $plugin->config;
+        return is_array($config) ? $config : (json_decode($config, true) ?? []);
     }
 }

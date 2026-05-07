@@ -54,7 +54,7 @@ class NodeSyncService
     /**
      * Push user changes (add/remove) to affected nodes
      */
-    public static function notifyUserChanged(User $user): void
+    public static function notifyUserChanged(User $user, bool $uuidChanged = false): void
     {
         if (!$user->group_id)
             return;
@@ -65,6 +65,10 @@ class NodeSyncService
                 continue;
 
             if ($user->isAvailable()) {
+                // UUID 变更（重置订阅）→ 先 remove 踢掉旧连接，再 add 新 UUID
+                if ($uuidChanged) {
+                    self::forceDisconnectUser($user->id, $server->id);
+                }
                 self::push($server->id, 'sync.user.delta', [
                     'action' => 'add',
                     'users' => [
@@ -178,6 +182,29 @@ class NodeSyncService
             Log::warning("[NodePush] Redis machine publish failed: {$e->getMessage()}", [
                 'machine_id' => $machineId,
                 'event' => $event,
+            ]);
+        }
+    }
+
+    /**
+     * Force disconnect a user from a specific node
+     * Sends sync.user.delta remove to kick existing connections,
+     * and clears Redis device state.
+     */
+    public static function forceDisconnectUser(int $userId, int $nodeId): void
+    {
+        self::push($nodeId, 'sync.user.delta', [
+            'action' => 'remove',
+            'users' => [['id' => $userId]],
+        ]);
+
+        try {
+            $deviceService = app(\App\Services\DeviceStateService::class);
+            $deviceService->removeNodeDevices($nodeId, $userId);
+        } catch (\Throwable $e) {
+            Log::warning("[NodePush] Failed to clear device state: {$e->getMessage()}", [
+                'user_id' => $userId,
+                'node_id' => $nodeId,
             ]);
         }
     }

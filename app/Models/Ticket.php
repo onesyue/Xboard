@@ -29,7 +29,12 @@ class Ticket extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'created_at' => 'timestamp',
-        'updated_at' => 'timestamp'
+        'updated_at' => 'timestamp',
+        'last_reply_user_id' => 'integer',
+        'user_id' => 'integer',
+        'status' => 'integer',
+        'reply_status' => 'integer',
+        'level' => 'integer'
     ];
 
     const STATUS_OPENING = 0;
@@ -52,12 +57,12 @@ class Ticket extends Model
      */
     public function messages(): HasMany
     {
-        return $this->hasMany(TicketMessage::class, 'ticket_id', 'id');
+        return $this->hasMany(TicketMessage::class, 'ticket_id', 'id')->orderBy('id');
     }
     
     // 即将删除
     public function message(): HasMany
     {
-        return $this->hasMany(TicketMessage::class, 'ticket_id', 'id');
+        return $this->hasMany(TicketMessage::class, 'ticket_id', 'id')->orderBy('id');
     }
 }

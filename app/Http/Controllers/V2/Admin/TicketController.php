@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -10,17 +11,19 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
+    use \App\Traits\QueryOperators;
     private function applyFiltersAndSorts(Request $request, $builder)
     {
         if ($request->has('filter')) {
             collect($request->input('filter'))->each(function ($filter) use ($builder) {
                 $key = $filter['id'];
+                if (!$this->isValidFieldName($key)) return;
                 $value = $filter['value'];
                 $builder->where(function ($query) use ($key, $value) {
                     if (is_array($value)) {
                         $query->whereIn($key, $value);
                     } else {
-                        $query->where($key, 'like', "%{$value}%");
+                        $query->where($key, 'ilike', "%{$value}%");
                     }
                 });
             });
@@ -29,6 +32,7 @@ class TicketController extends Controller
         if ($request->has('sort')) {
             collect($request->input('sort'))->each(function ($sort) use ($builder) {
                 $key = $sort['id'];
+                if (!$this->isValidFieldName($key)) return;
                 $value = $sort['desc'] ? 'DESC' : 'ASC';
                 $builder->orderBy($key, $value);
             });
@@ -57,6 +61,11 @@ class TicketController extends Controller
         }
         $ticket->messages->each(fn($msg) => $msg->setRelation('ticket', $ticket));
         $result = $ticket->toArray();
+        // [is_me compat] upstream renamed is_me to is_from_user/is_from_admin but admin bundle still reads is_me
+        if (isset($result['messages']) && is_array($result['messages'])) {
+            foreach ($result['messages'] as &$__m) { $__m['is_me'] = !empty($__m['is_from_admin']); }
+            unset($__m);
+        }
         $result['user'] = UserController::transformUserData($ticket->user);
 
         return $this->success($result);
@@ -84,7 +93,7 @@ class TicketController extends Controller
 
         $this->applyFiltersAndSorts($request, $ticketModel);
         $tickets = $ticketModel
-            ->latest('updated_at')
+            ->latest('updated_at')->orderBy('id', 'desc')
             ->paginate(
                 perPage: $request->integer('pageSize', 10),
                 page: $request->integer('current', 1)

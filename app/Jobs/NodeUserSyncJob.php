@@ -20,7 +20,8 @@ class NodeUserSyncJob implements ShouldQueue
     public function __construct(
         private readonly int $userId,
         private readonly string $action,
-        private readonly ?int $oldGroupId = null
+        private readonly ?int $oldGroupId = null,
+        private readonly bool $uuidChanged = false
     ) {
         $this->onQueue('node_sync');
     }
@@ -34,7 +35,7 @@ class NodeUserSyncJob implements ShouldQueue
                 NodeSyncService::notifyUserRemovedFromGroup($this->userId, $this->oldGroupId);
             }
             if ($user) {
-                NodeSyncService::notifyUserChanged($user);
+                NodeSyncService::notifyUserChanged($user, $this->uuidChanged);
             }
         } elseif ($this->action === 'deleted') {
             if ($this->oldGroupId) {

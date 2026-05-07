@@ -1,0 +1,33 @@
+name: Source Integrity
+
+on:
+  pull_request:
+    branches: ["master"]
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  php-syntax:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+
+      - name: Validate composer metadata
+        run: composer validate --strict --no-check-publish
+
+      - name: PHP syntax check
+        run: |
+          find app bootstrap config database plugins-core resources routes tests \
+            -name '*.php' -print0 \
+            | xargs -0 -n 1 php -l

@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -52,6 +53,7 @@ class UserController extends Controller
 
         collect($request->input('filter'))->each(function ($filter) use ($builder) {
             $field = $filter['id'];
+            if (!$this->isValidFieldName($field)) return;
             $value = $filter['value'];
             $logic = strtolower($filter['logic'] ?? 'and');
 
@@ -83,7 +85,7 @@ class UserController extends Controller
                     [$operator, $filterValue] = explode(':', $value, 2);
                     $this->applyQueryCondition($q, $relationField, $operator, $filterValue);
                 } else {
-                    $q->where($relationField, 'like', "%{$value}%");
+                    $q->where($relationField, 'ilike', "%{$value}%");
                 }
             });
             return;
@@ -97,7 +99,7 @@ class UserController extends Controller
 
         // 处理基于运算符的过滤
         if (!is_string($value) || !str_contains($value, ':')) {
-            $query->where($field, 'like', "%{$value}%");
+            $query->where($field, 'ilike', "%{$value}%");
             return;
         }
 
@@ -128,8 +130,14 @@ class UserController extends Controller
 
         collect($request->input('sort'))->each(function ($sort) use ($builder) {
             $field = $sort['id'];
+            if (!$this->isValidFieldName($field)) return;
             $direction = $sort['desc'] ? 'DESC' : 'ASC';
-            $builder->orderBy($field, $direction);
+            // online_count may be NULL — treat as 0 so NULLs sort correctly
+            if ($field === "online_count") {
+                $builder->orderByRaw("COALESCE(online_count, 0) " . $direction);
+            } else {
+                $builder->orderBy($field, $direction);
+            }
         });
     }
 

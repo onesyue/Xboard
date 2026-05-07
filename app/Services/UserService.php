@@ -10,6 +10,7 @@ use App\Models\Plan;
 use App\Models\Server;
 use App\Models\User;
 use App\Services\Plugin\HookManager;
+use Illuminate\Support\Facades\DB;
 use App\Services\TrafficResetService;
 use App\Models\TrafficResetLog;
 use App\Utils\Helper;
@@ -58,9 +59,9 @@ class UserService
         return User::whereRaw('u + d < transfer_enable')
             ->where(function ($query) {
                 $query->where('expired_at', '>=', time())
-                    ->orWhere('expired_at', NULL);
+                    ->orWhereNull('expired_at');
             })
-            ->where('banned', 0)
+            ->where('banned', false)
             ->get();
     }
 
@@ -71,7 +72,7 @@ class UserService
                 ->orWhere('expired_at', 0);
         })
             ->where(function ($query) {
-                $query->where('plan_id', NULL)
+                $query->whereNull('plan_id')
                     ->orWhere('transfer_enable', 0);
             })
             ->get();
@@ -89,18 +90,28 @@ class UserService
 
     public function addBalance(int $userId, int $balance): bool
     {
-        $user = User::lockForUpdate()->find($userId);
-        if (!$user) {
-            return false;
-        }
-        $user->balance = $user->balance + $balance;
-        if ($user->balance < 0) {
-            return false;
-        }
-        if (!$user->save()) {
-            return false;
-        }
-        return true;
+        return DB::transaction(function () use ($userId, $balance) {
+            $user = User::lockForUpdate()->find($userId);
+            if (!$user) {
+                return false;
+            }
+            $user->balance = $user->balance + $balance;
+            if ($user->balance < 0) {
+                return false;
+            }
+            if (!$user->save()) {
+                return false;
+            }
+            // [Patch BAL] Sync user_account.balance — FIFO consume gift balance
+            if ($balance < 0) {
+                $amt = (int) abs($balance);
+                DB::table('user_account')
+                    ->where('account_id', $userId)
+                    ->where('balance', '>', 0)
+                    ->update(['balance' => DB::raw("GREATEST(balance - {$amt}, 0)")]);
+            }
+            return true;
+        });
     }
 
     public function isNotCompleteOrderByUserId(int $userId): bool

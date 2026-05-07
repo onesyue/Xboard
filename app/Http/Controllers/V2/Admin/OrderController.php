@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V2\Admin;
 
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    use \App\Traits\QueryOperators;
 
     public function detail(Request $request)
     {
@@ -48,7 +50,7 @@ class OrderController extends Controller
 
         /** @var \Illuminate\Pagination\LengthAwarePaginator $paginatedResults */
         $paginatedResults = $orderModel
-            ->latest('created_at')
+            ->latest('created_at')->orderBy('id', 'desc')
             ->paginate(
                 perPage: $pageSize,
                 page: $current
@@ -77,6 +79,7 @@ class OrderController extends Controller
 
         collect($request->input('filter'))->each(function ($filter) use ($builder) {
             $field = $filter['id'];
+            if (!$this->isValidFieldName($field)) return;
             $value = $filter['value'];
 
             $builder->where(function ($query) use ($field, $value) {
@@ -95,7 +98,7 @@ class OrderController extends Controller
 
         // Handle operator-based filtering
         if (!is_string($value) || !str_contains($value, ':')) {
-            $query->where($field, 'like', "%{$value}%");
+            $query->where($field, 'ilike', "%{$value}%");
             return;
         }
 
@@ -115,11 +118,11 @@ class OrderController extends Controller
             'gte' => '>=',
             'lt' => '<',
             'lte' => '<=',
-            'like' => 'like',
+            'like' => 'ilike',
             'notlike' => 'not like',
             'null' => static fn($q) => $q->whereNull($field),
             'notnull' => static fn($q) => $q->whereNotNull($field),
-            default => 'like'
+            default => 'ilike'
         }, match (strtolower($operator)) {
             'like', 'notlike' => "%{$filterValue}%",
             'null', 'notnull' => null,
@@ -135,6 +138,7 @@ class OrderController extends Controller
 
         collect($request->input('sort'))->each(function ($sort) use ($builder) {
             $field = $sort['id'];
+            if (!$this->isValidFieldName($field)) return;
             $direction = $sort['desc'] ? 'DESC' : 'ASC';
             $builder->orderBy($field, $direction);
         });

@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Scope;
 
@@ -40,7 +41,7 @@ trait FilterScope
                     continue;
                 }
                 if ($filter['condition'] === 'like') {
-                    $builder->where($filter['key'], 'like', "%{$filter['value']}%");
+                    $builder->where($filter['key'], 'ilike', "%{$filter['value']}%");
                     continue;
                 }
             }

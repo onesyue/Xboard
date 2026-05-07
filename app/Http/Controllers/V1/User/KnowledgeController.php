@@ -1,4 +1,5 @@
 <?php
+// [PG ILIKE patch]
 
 namespace App\Http\Controllers\V1\User;
 
@@ -59,8 +60,8 @@ class KnowledgeController extends Controller
         $keyword = $request->input('keyword');
         if ($keyword) {
             $builder = $builder->where(function ($query) use ($keyword) {
-                $query->where('title', 'LIKE', "%{$keyword}%")
-                    ->orWhere('body', 'LIKE', "%{$keyword}%");
+                $query->where('title', 'ilike', "%{$keyword}%")
+                    ->orWhere('body', 'ilike', "%{$keyword}%");
             });
         }
 
@@ -77,7 +78,7 @@ class KnowledgeController extends Controller
 
     private function buildKnowledgeQuery(array $select = ['*'])
     {
-        return Knowledge::select($select)->where('show', 1);
+        return Knowledge::select($select)->where('show', true);
     }
 
     private function processKnowledgeContent(array $knowledge, User $user): array
