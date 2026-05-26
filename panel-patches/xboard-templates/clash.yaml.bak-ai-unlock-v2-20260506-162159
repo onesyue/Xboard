@@ -1,0 +1,873 @@
+geodata-mode: true
+geox-url:
+  geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  asn: "https://fastly.jsdelivr.net/gh/xishang0128/geoip@release/GeoLite2-ASN.mmdb"
+geo-auto-update: true
+geo-update-interval: 24
+
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+ipv6: false
+log-level: warning
+
+tcp-concurrent: true
+unified-delay: true
+keep-alive-interval: 30
+global-client-fingerprint: random
+find-process-mode: strict
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+sniffer:
+  enable: true
+  parse-pure-ip: true
+  force-dns-mapping: false
+  override-destination: false
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: false
+    TLS:
+      ports: [443, 8443]
+      override-destination: false
+    QUIC:
+      ports: [443, 8443]
+      override-destination: false
+  skip-domain: &skip_domains
+    - "*.lan"
+    - "*.local"
+    - "*.arpa"
+    - "localhost"
+    - "localhost.localdomain"
+    - "router.asus.com"
+    - "routerlogin.net"
+    - "captive.apple.com"
+    - "+.push.apple.com"
+    - "+.icloud.com"
+    - "+.apple.com"
+    - "msftconnecttest.com"
+    - "www.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "connectivitycheck.gstatic.com"
+    - "connectivitycheck.android.com"
+    - "clients3.google.com"
+    - "clients4.google.com"
+    - "android.clients.google.com"
+    - "time.*"
+    - "ntp.*"
+    - "+.market.xiaomi.com"
+    - "localhost.ptlogin2.qq.com"
+    - "Mijia Cloud"
+    - "+._dns-sd._udp.*"
+    - "+._services._dns-sd._udp.*"
+
+dns:
+  enable: true
+  listen: ":1053"
+  enhanced-mode: "fake-ip"
+  fake-ip-range: "198.18.0.1/16"
+  fake-ip-filter-mode: "blacklist"
+  prefer-h3: false
+  respect-rules: true
+  use-hosts: true
+  use-system-hosts: true
+  ipv6: false
+  fake-ip-filter: *skip_domains
+
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+    - "https://doh.pub/dns-query"
+    - "https://dns.alidns.com/dns-query"
+
+  direct-nameserver:
+    - 223.5.5.5
+    - 223.6.6.6
+    - 119.29.29.29
+
+  proxy-server-nameserver:
+    - "https://dns.alidns.com/dns-query"
+    - "https://doh.pub/dns-query"
+
+  nameserver-policy:
+    "geosite:geolocation-!cn":
+      - "https://cloudflare-dns.com/dns-query"
+      - "https://dns.google/dns-query"
+    "+.claude.ai,+.anthropic.com,+.openai.com,+.chatgpt.com,+.cursor.com,+.cursor.sh,+.x.ai,+.grok.com,+.poe.com,+.perplexity.ai,+.huggingface.co,+.cohere.com,+.mistral.ai,+.together.ai,+.groq.com,+.fireworks.ai,+.replicate.com,+.midjourney.com,+.stability.ai,+.runwayml.com,+.copilot.microsoft.com,+.codeium.com,+.windsurf.com,+.bolt.new,+.v0.dev,+.replit.com,+.replit.dev,+.vercel.ai,+.gemini.google.com,+.bard.google.com,+.aistudio.google.com,+.ai.google.dev,+.generativelanguage.googleapis.com,+.meta.ai,+.sora.com":
+      - "https://cloudflare-dns.com/dns-query"
+      - "https://dns.google/dns-query"
+
+  fallback:
+    - "https://cloudflare-dns.com/dns-query"
+    - "https://dns.google/dns-query"
+    - "https://dns.quad9.net/dns-query"
+
+  fallback-filter:
+    geoip: true
+    geoip-code: "CN"
+    ipcidr:
+      - "240.0.0.0/4"
+      - "0.0.0.0/32"
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+      - "127.0.0.0/8"
+    domain:
+      - "+.google.com"
+      - "+.gstatic.com"
+      - "+.googleapis.com"
+      - "+.ggpht.com"
+      - "+.youtube.com"
+      - "+.ytimg.com"
+      - "+.facebook.com"
+      - "+.fbcdn.net"
+      - "+.instagram.com"
+      - "+.cdninstagram.com"
+      - "+.twitter.com"
+      - "+.x.com"
+      - "+.t.co"
+      - "+.github.com"
+      - "+.githubusercontent.com"
+      - "+.telegram.org"
+      - "+.telegram.me"
+      - "+.t.me"
+      - "+.discord.com"
+      - "+.discord.gg"
+      - "+.discordapp.com"
+      - "+.cloudflare.com"
+      - "+.wikipedia.org"
+      - "+.reddit.com"
+      - "+.openai.com"
+      - "+.chatgpt.com"
+      - "+.cdn.openai.com"
+      - "+.anthropic.com"
+      - "+.claude.ai"
+      - "+.linkedin.com"
+      - "+.licdn.com"
+
+proxies:
+
+proxy-groups:
+  - name: "$app_name"
+    type: select
+    proxies:
+      - 悦 · 自动选择
+      - 悦 · 故障转移
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇬🇧 英国聚合
+      - 悦 · 🇩🇪 德国聚合
+      - 悦 · 🇳🇱 荷兰聚合
+      - 悦 · 🇦🇺 澳大利亚聚合
+      - 悦 · 🇨🇦 加拿大聚合
+      - 悦 · 🌏 更多地区
+
+  - name: "YouTube"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇬🇧 英国聚合
+      - 悦 · 🇩🇪 德国聚合
+      - 悦 · 🇳🇱 荷兰聚合
+
+  - name: "流媒体"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇬🇧 英国聚合
+      - 悦 · 🇩🇪 德国聚合
+      - 悦 · 🇳🇱 荷兰聚合
+      - 悦 · 🇦🇺 澳大利亚聚合
+
+  - name: "TikTok"
+    type: select
+    proxies:
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🌏 更多地区
+      - $app_name
+
+  - name: "AI"
+    type: select
+    proxies:
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇬🇧 英国聚合
+      - 悦 · 🇩🇪 德国聚合
+      - 悦 · 🇳🇱 荷兰聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇨🇦 加拿大聚合
+      - 悦 · 🇦🇺 澳大利亚聚合
+      - $app_name
+
+  - name: "Google"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+
+  - name: "Telegram"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇩🇪 德国聚合
+
+  - name: "社交媒体"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇬🇧 英国聚合
+
+  - name: "GitHub"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+      - DIRECT
+
+  - name: "游戏平台"
+    type: select
+    proxies:
+      - DIRECT
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇰🇷 韩国聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+
+  - name: "兜底分流"
+    type: select
+    proxies:
+      - $app_name
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇺🇸 美国聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🌏 更多地区
+      - DIRECT
+
+  - name: "悦 · 自动选择"
+    type: url-test
+    tolerance: 50
+    proxies:
+      - /./
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 故障转移"
+    type: fallback
+    proxies:
+      - 悦 · 🇭🇰 香港聚合
+      - 悦 · 🇹🇼 台湾聚合
+      - 悦 · 🇯🇵 日本聚合
+      - 悦 · 🇸🇬 新加坡聚合
+      - 悦 · 🇺🇸 美国聚合
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+
+  - name: "悦 · 🇭🇰 香港聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇭🇰|香港|Hong.?Kong|Hong|(^|[^A-Za-z])HK([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇹🇼 台湾聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇹🇼|台湾|台灣|Taiwan|Taipei|(^|[^A-Za-z])TW([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇯🇵 日本聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇯🇵|日本|Japan|Tokyo|Osaka|东京|大阪|(^|[^A-Za-z])JP([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇰🇷 韩国聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇰🇷|韩国|韓國|Korea|Seoul|首尔|(^|[^A-Za-z])KR([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇸🇬 新加坡聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇸🇬|新加坡|狮城|Singapore|(^|[^A-Za-z])SG([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇺🇸 美国聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)^(?!.*AI).*(🇺🇸|美国|美國|United.?States|America|Los.?Angeles|San.?Jose|Seattle|Chicago|Dallas|(^|[^A-Za-z])USA?([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇬🇧 英国聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇬🇧|英国|英國|United.?Kingdom|Britain|England|London|伦敦|UK)/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇩🇪 德国聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇩🇪|德国|德國|Germany|Frankfurt|Berlin|法兰克福|柏林|(^|[^A-Za-z])DE([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇦🇺 澳大利亚聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇦🇺|澳大利亚|澳洲|Australia|Sydney|Melbourne|悉尼|墨尔本|(^|[^A-Za-z])AU([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇨🇦 加拿大聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇨🇦|加拿大|Canada|Toronto|Vancouver|Montreal|多伦多|温哥华|(^|[^A-Za-z])CA([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🇳🇱 荷兰聚合"
+    type: url-test
+    tolerance: 50
+    expected-status: 200-299
+    proxies:
+      - /(?i)(🇳🇱|荷兰|荷蘭|Netherlands|Nederland|Amsterdam|阿姆斯特丹|(^|[^A-Za-z])NL([^A-Za-z]|$))/
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    lazy: true
+
+  - name: "悦 · 🌏 更多地区"
+    type: select
+    proxies:
+      - /./
+    exclude-filter: "(?i)(剩余|到期|官网|流量|套餐|重置|过期)"
+
+rule-providers:
+  ads:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/AdvertisingLite/AdvertisingLite_Classical.yaml"
+    path: ./ruleset/ads.yaml
+    interval: 86400
+
+  openai:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/OpenAI/OpenAI.yaml"
+    path: ./ruleset/openai.yaml
+    interval: 86400
+
+  claude:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.yaml"
+    path: ./ruleset/claude.yaml
+    interval: 86400
+
+  gemini:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Gemini/Gemini.yaml"
+    path: ./ruleset/gemini.yaml
+    interval: 86400
+
+  copilot:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Copilot/Copilot.yaml"
+    path: ./ruleset/copilot.yaml
+    interval: 86400
+
+  bing:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Bing/Bing.yaml"
+    path: ./ruleset/bing.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Apple/Apple_Classical.yaml"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  microsoft:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Microsoft/Microsoft.yaml"
+    path: ./ruleset/microsoft.yaml
+    interval: 86400
+
+  amazon:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Amazon/Amazon.yaml"
+    path: ./ruleset/amazon.yaml
+    interval: 86400
+
+  youtube:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/YouTube/YouTube.yaml"
+    path: ./ruleset/youtube.yaml
+    interval: 86400
+
+  netflix:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Netflix/Netflix.yaml"
+    path: ./ruleset/netflix.yaml
+    interval: 86400
+
+  disney:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Disney/Disney.yaml"
+    path: ./ruleset/disney.yaml
+    interval: 86400
+
+  spotify:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify.yaml"
+    path: ./ruleset/spotify.yaml
+    interval: 86400
+
+  tiktok:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/TikTok/TikTok.yaml"
+    path: ./ruleset/tiktok.yaml
+    interval: 86400
+
+  twitch:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Twitch/Twitch.yaml"
+    path: ./ruleset/twitch.yaml
+    interval: 86400
+
+  bahamut:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Bahamut/Bahamut.yaml"
+    path: ./ruleset/bahamut.yaml
+    interval: 86400
+
+  primevideo:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PrimeVideo/PrimeVideo.yaml"
+    path: ./ruleset/primevideo.yaml
+    interval: 86400
+
+  hbo:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/HBO/HBO.yaml"
+    path: ./ruleset/hbo.yaml
+    interval: 86400
+
+  bilibili:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/BiliBili/BiliBili.yaml"
+    path: ./ruleset/bilibili.yaml
+    interval: 86400
+
+  globalmedia:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/GlobalMedia/GlobalMedia_Classical.yaml"
+    path: ./ruleset/globalmedia.yaml
+    interval: 86400
+
+  chinamedia:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/ChinaMedia/ChinaMedia.yaml"
+    path: ./ruleset/chinamedia.yaml
+    interval: 86400
+
+  telegram:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Telegram/Telegram.yaml"
+    path: ./ruleset/telegram.yaml
+    interval: 86400
+
+  twitter:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Twitter/Twitter.yaml"
+    path: ./ruleset/twitter.yaml
+    interval: 86400
+
+  facebook:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Facebook/Facebook.yaml"
+    path: ./ruleset/facebook.yaml
+    interval: 86400
+
+  instagram:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Instagram/Instagram.yaml"
+    path: ./ruleset/instagram.yaml
+    interval: 86400
+
+  discord:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Discord/Discord.yaml"
+    path: ./ruleset/discord.yaml
+    interval: 86400
+
+  whatsapp:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Whatsapp/Whatsapp.yaml"
+    path: ./ruleset/whatsapp.yaml
+    interval: 86400
+
+  line:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Line/Line.yaml"
+    path: ./ruleset/line.yaml
+    interval: 86400
+
+  reddit:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Reddit/Reddit.yaml"
+    path: ./ruleset/reddit.yaml
+    interval: 86400
+
+  linkedin:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/LinkedIn/LinkedIn.yaml"
+    path: ./ruleset/linkedin.yaml
+    interval: 86400
+
+  google:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Google/Google.yaml"
+    path: ./ruleset/google.yaml
+    interval: 86400
+
+  github:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/GitHub/GitHub.yaml"
+    path: ./ruleset/github.yaml
+    interval: 86400
+
+  steam:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Steam/Steam.yaml"
+    path: ./ruleset/steam.yaml
+    interval: 86400
+
+  epic:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Epic/Epic.yaml"
+    path: ./ruleset/epic.yaml
+    interval: 86400
+
+  playstation:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PlayStation/PlayStation.yaml"
+    path: ./ruleset/playstation.yaml
+    interval: 86400
+
+  xbox:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Xbox/Xbox.yaml"
+    path: ./ruleset/xbox.yaml
+    interval: 86400
+
+  nintendo:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nintendo/Nintendo.yaml"
+    path: ./ruleset/nintendo.yaml
+    interval: 86400
+
+  game:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Game/Game.yaml"
+    path: ./ruleset/game.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Proxy/Proxy_Classical.yaml"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  china:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/China/China_Classical.yaml"
+    path: ./ruleset/china.yaml
+    interval: 86400
+
+  chinaips:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/ChinaIPs/ChinaIPs_Classical_No_Resolve.yaml"
+    path: ./ruleset/chinaips.yaml
+    interval: 86400
+
+  lan:
+    type: http
+    behavior: classical
+    url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Lan/Lan.yaml"
+    path: ./ruleset/lan.yaml
+    interval: 86400
+
+rules:
+  # Reject QUIC (UDP/443) -> force TCP fallback (YouTube 视频慢修复)
+  - RULE-SET,lan,DIRECT
+
+  - RULE-SET,ads,REJECT
+
+  # AI服务
+  - RULE-SET,openai,AI
+  - RULE-SET,claude,AI
+  - RULE-SET,gemini,AI
+  - RULE-SET,copilot,AI
+  - DOMAIN-SUFFIX,perplexity.ai,AI
+  - DOMAIN-SUFFIX,poe.com,AI
+  - DOMAIN-SUFFIX,sora.com,AI
+  - DOMAIN-SUFFIX,grok.com,AI
+  - DOMAIN-SUFFIX,x.ai,AI
+  - DOMAIN-SUFFIX,meta.ai,AI
+  - DOMAIN-SUFFIX,huggingface.co,AI
+  - DOMAIN-SUFFIX,replicate.com,AI
+  - DOMAIN-SUFFIX,midjourney.com,AI
+  - DOMAIN-SUFFIX,stability.ai,AI
+  - DOMAIN-SUFFIX,runway.com,AI
+  - DOMAIN-SUFFIX,runwayml.com,AI
+  - DOMAIN-SUFFIX,mistral.ai,AI
+  - DOMAIN-SUFFIX,cohere.com,AI
+  - DOMAIN-SUFFIX,together.ai,AI
+  - DOMAIN-SUFFIX,groq.com,AI
+  - DOMAIN-SUFFIX,fireworks.ai,AI
+  - DOMAIN-SUFFIX,chatgpt.com,AI
+  - DOMAIN-SUFFIX,cursor.com,AI
+  - DOMAIN-SUFFIX,cursor.sh,AI
+  - DOMAIN-SUFFIX,codeium.com,AI
+  - DOMAIN-SUFFIX,windsurf.com,AI
+  - DOMAIN-SUFFIX,bolt.new,AI
+  - DOMAIN-SUFFIX,v0.dev,AI
+  - DOMAIN-SUFFIX,replit.com,AI
+  - DOMAIN-SUFFIX,replit.dev,AI
+  - DOMAIN-SUFFIX,vercel.ai,AI
+  - DOMAIN-SUFFIX,anthropic.com,AI
+  - DOMAIN-SUFFIX,claude.ai,AI
+  - DOMAIN-SUFFIX,claude.site,AI
+  - DOMAIN-SUFFIX,notebooklm.google,AI
+  - DOMAIN-SUFFIX,ai.google.dev,AI
+  - DOMAIN-SUFFIX,aistudio.google.com,AI
+  - DOMAIN-SUFFIX,suno.ai,AI
+  - DOMAIN-SUFFIX,suno.com,AI
+  - DOMAIN-SUFFIX,udio.com,AI
+  - DOMAIN-SUFFIX,devin.ai,AI
+  - DOMAIN-SUFFIX,cognition.ai,AI
+  - DOMAIN-SUFFIX,lovable.dev,AI
+  - DOMAIN-SUFFIX,labs.google,AI
+  - DOMAIN-SUFFIX,lmsys.org,AI
+  - DOMAIN-SUFFIX,dify.ai,AI
+  - DOMAIN-SUFFIX,coze.com,AI
+  - DOMAIN-SUFFIX,character.ai,AI
+  - DOMAIN-SUFFIX,jasper.ai,AI
+  - DOMAIN-SUFFIX,elevenlabs.io,AI
+  - DOMAIN-SUFFIX,heygen.com,AI
+  - DOMAIN-SUFFIX,synthesia.io,AI
+
+  # DeepSeek 国内服务直连
+  - DOMAIN-SUFFIX,deepseek.com,DIRECT
+
+  # Bing搜索走Google组, Copilot已由上方规则集单独处理
+  - RULE-SET,bing,Google
+
+  - RULE-SET,apple,DIRECT
+  # Microsoft国际版走代理
+  - RULE-SET,microsoft,$app_name
+
+  - RULE-SET,youtube,YouTube
+
+  - RULE-SET,netflix,流媒体
+  - RULE-SET,disney,流媒体
+  - RULE-SET,spotify,流媒体
+  - RULE-SET,twitch,流媒体
+  - RULE-SET,bahamut,流媒体
+  - RULE-SET,primevideo,流媒体
+  - RULE-SET,hbo,流媒体
+  - DOMAIN-KEYWORD,emby,流媒体
+  - DOMAIN-KEYWORD,jellyfin,流媒体
+  - RULE-SET,bilibili,DIRECT
+  - RULE-SET,chinamedia,DIRECT
+  - RULE-SET,globalmedia,流媒体
+
+  - RULE-SET,tiktok,TikTok
+
+  - RULE-SET,google,Google
+
+  - RULE-SET,telegram,Telegram
+
+  - RULE-SET,twitter,社交媒体
+  - RULE-SET,facebook,社交媒体
+  - RULE-SET,instagram,社交媒体
+  - RULE-SET,discord,社交媒体
+  - RULE-SET,whatsapp,社交媒体
+  - RULE-SET,line,社交媒体
+  - RULE-SET,reddit,社交媒体
+  - RULE-SET,linkedin,社交媒体
+  - DOMAIN-SUFFIX,threads.net,社交媒体
+  - DOMAIN-SUFFIX,bsky.app,社交媒体
+  - DOMAIN-SUFFIX,bsky.social,社交媒体
+  - DOMAIN-KEYWORD,mastodon,社交媒体
+  - DOMAIN-SUFFIX,misskey.io,社交媒体
+
+  - RULE-SET,github,GitHub
+
+  - RULE-SET,steam,游戏平台
+  - RULE-SET,epic,游戏平台
+  - RULE-SET,playstation,游戏平台
+  - RULE-SET,xbox,游戏平台
+  - RULE-SET,nintendo,游戏平台
+  - RULE-SET,game,游戏平台
+
+  # 企业SaaS
+  - DOMAIN-SUFFIX,zoom.us,$app_name
+  - DOMAIN-SUFFIX,zoom.com,$app_name
+  - DOMAIN-SUFFIX,zoomgov.com,$app_name
+  - DOMAIN-SUFFIX,slack.com,$app_name
+  - DOMAIN-SUFFIX,slack-edge.com,$app_name
+  - DOMAIN-SUFFIX,notion.so,$app_name
+  - DOMAIN-SUFFIX,notion-static.com,$app_name
+  - DOMAIN-SUFFIX,figma.com,$app_name
+  - DOMAIN-SUFFIX,atlassian.com,$app_name
+  - DOMAIN-SUFFIX,atlassian.net,$app_name
+  - DOMAIN-SUFFIX,jira.com,$app_name
+  - DOMAIN-SUFFIX,trello.com,$app_name
+  - DOMAIN-SUFFIX,salesforce.com,$app_name
+  - DOMAIN-SUFFIX,force.com,$app_name
+
+  # 跨境电商/支付
+  - RULE-SET,amazon,兜底分流
+  - DOMAIN-SUFFIX,shopify.com,兜底分流
+  - DOMAIN-SUFFIX,myshopify.com,兜底分流
+  - DOMAIN-SUFFIX,paypal.com,兜底分流
+  - DOMAIN-SUFFIX,stripe.com,兜底分流
+
+  - RULE-SET,proxy,兜底分流
+
+  - RULE-SET,china,DIRECT
+  - RULE-SET,chinaips,DIRECT
+
+  - GEOIP,CN,DIRECT,no-resolve
+  - MATCH,兜底分流
