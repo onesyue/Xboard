@@ -139,8 +139,12 @@ class Stash extends AbstractProtocol
 
         $config['proxies'] = array_merge($config['proxies'] ? $config['proxies'] : [], $proxy);
         foreach ($config['proxy-groups'] as $k => $v) {
-            if (!is_array($config['proxy-groups'][$k]['proxies']))
+            if (!isset($config['proxy-groups'][$k]['proxies']) || !is_array($config['proxy-groups'][$k]['proxies']))
                 $config['proxy-groups'][$k]['proxies'] = [];
+            // Stash supports include-all: true + filter (and `use:` from proxy-providers);
+            // those groups must not have every node appended and must not be dropped
+            // when their inline proxies array is empty.
+            $usesClientSideFilter = !empty($config['proxy-groups'][$k]['include-all']) || !empty($config['proxy-groups'][$k]['use']);
             $isFilter = false;
             foreach ($config['proxy-groups'][$k]['proxies'] as $src) {
                 foreach ($proxies as $dst) {
@@ -157,10 +161,16 @@ class Stash extends AbstractProtocol
             }
             if ($isFilter)
                 continue;
+            if ($usesClientSideFilter) {
+                if ($config['proxy-groups'][$k]['proxies'] === []) {
+                    unset($config['proxy-groups'][$k]['proxies']);
+                }
+                continue;
+            }
             $config['proxy-groups'][$k]['proxies'] = array_merge($config['proxy-groups'][$k]['proxies'], $proxies);
         }
         $config['proxy-groups'] = array_filter($config['proxy-groups'], function ($group) {
-            return $group['proxies'];
+            return !empty($group['proxies']) || !empty($group['include-all']) || !empty($group['use']);
         });
         $config['proxy-groups'] = array_values($config['proxy-groups']);
         // Force the current subscription domain to be a direct rule
@@ -169,7 +179,10 @@ class Stash extends AbstractProtocol
             array_unshift($config['rules'], "DOMAIN,{$subsDomain},DIRECT");
         }
 
-        $yaml = Yaml::dump($config, 2, 4, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+        $yaml = Yaml::dump($config, 8, 4, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+        // Stash chokes on bare +.domain entries; symfony/yaml does not quote them.
+        $yaml = preg_replace('/^(\s*-\s)(\+\.[^\'"\r\n]*)$/m', '$1\'$2\'', $yaml);
+        $yaml = preg_replace('/^(\s*)(\+\.[^:\'"\r\n]*):/m', '$1\'$2\':', $yaml);
         $yaml = str_replace('$app_name', admin_setting('app_name', 'XBoard'), $yaml);
         return response($yaml)
             ->header('content-type', 'text/yaml')
