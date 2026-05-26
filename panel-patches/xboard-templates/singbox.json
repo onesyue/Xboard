@@ -1,0 +1,1120 @@
+{
+    "log": {
+        "level": "warn",
+        "timestamp": true
+    },
+    "experimental": {
+        "cache_file": {
+            "enabled": true,
+            "path": "cache.db",
+            "cache_id": "cache_db",
+            "store_fakeip": true
+        },
+        "clash_api": {
+            "external_controller": "127.0.0.1:9090",
+            "secret": "",
+            "default_mode": "rule"
+        }
+    },
+    "dns": {
+        "strategy": "prefer_ipv4",
+        "servers": [
+            {
+                "tag": "local-ali",
+                "type": "https",
+                "server": "223.5.5.5",
+                "detour": "direct"
+            },
+            {
+                "tag": "local-tencent",
+                "type": "https",
+                "server": "doh.pub",
+                "detour": "direct"
+            },
+            {
+                "tag": "remote-cf",
+                "type": "https",
+                "server": "cloudflare-dns.com",
+                "detour": "节点选择"
+            },
+            {
+                "tag": "fakeip",
+                "type": "fakeip",
+                "inet4_range": "198.18.0.0/15"
+            }
+        ],
+        "rules": [
+            {
+                "clash_mode": "global",
+                "server": "remote-cf"
+            },
+            {
+                "clash_mode": "direct",
+                "server": "local-ali"
+            },
+            {
+                "rule_set": [
+                    "ads"
+                ],
+                "action": "reject"
+            },
+            {
+                "ip_is_private": true,
+                "server": "local-ali"
+            },
+            {
+                "domain_suffix": [
+                    "lan",
+                    "local",
+                    "arpa"
+                ],
+                "server": "local-ali"
+            },
+            {
+                "domain": [
+                    "router.asus.com",
+                    "routerlogin.net",
+                    "captive.apple.com",
+                    "connectivitycheck.gstatic.com",
+                    "connectivitycheck.android.com",
+                    "localhost.ptlogin2.qq.com"
+                ],
+                "server": "local-ali"
+            },
+            {
+                "rule_set": [
+                    "openai"
+                ],
+                "server": "remote-cf"
+            },
+            {
+                "domain_suffix": [
+                    "anthropic.com",
+                    "claude.ai",
+                    "gemini.google.com",
+                    "bard.google.com",
+                    "ai.google.dev",
+                    "generativelanguage.googleapis.com",
+                    "aistudio.google.com",
+                    "copilot.microsoft.com",
+                    "sydney.bing.com",
+                    "perplexity.ai",
+                    "poe.com",
+                    "sora.com",
+                    "grok.com",
+                    "x.ai",
+                    "meta.ai",
+                    "huggingface.co",
+                    "replicate.com",
+                    "midjourney.com",
+                    "stability.ai",
+                    "runway.com",
+                    "runwayml.com",
+                    "mistral.ai",
+                    "cohere.com",
+                    "together.ai",
+                    "groq.com",
+                    "fireworks.ai",
+                    "chatgpt.com",
+                    "cursor.com",
+                    "cursor.sh",
+                    "codeium.com",
+                    "windsurf.com",
+                    "bolt.new",
+                    "v0.dev",
+                    "replit.com",
+                    "replit.dev",
+                    "vercel.ai"
+                ],
+                "server": "remote-cf"
+            },
+            {
+                "domain_suffix": [
+                    "deepseek.com"
+                ],
+                "server": "local-ali"
+            },
+            {
+                "rule_set": [
+                    "apple"
+                ],
+                "server": "local-ali"
+            },
+            {
+                "rule_set": [
+                    "microsoft",
+                    "bing",
+                    "amazon"
+                ],
+                "server": "remote-cf"
+            },
+            {
+                "domain_suffix": [
+                    "zoom.us",
+                    "zoom.com",
+                    "zoomgov.com",
+                    "slack.com",
+                    "slack-edge.com",
+                    "notion.so",
+                    "notion-static.com",
+                    "figma.com",
+                    "atlassian.com",
+                    "atlassian.net",
+                    "jira.com",
+                    "trello.com",
+                    "salesforce.com",
+                    "force.com",
+                    "shopify.com",
+                    "myshopify.com",
+                    "paypal.com",
+                    "stripe.com"
+                ],
+                "server": "remote-cf"
+            },
+            {
+                "rule_set": [
+                    "cn"
+                ],
+                "server": "local-tencent"
+            },
+            {
+                "rule_set": [
+                    "notcn"
+                ],
+                "server": "remote-cf"
+            }
+        ],
+        "final": "remote-cf"
+    },
+    "inbounds": [
+        {
+            "type": "tun",
+            "tag": "tun-in",
+            "address": [
+                "172.19.0.1/30"
+            ],
+            "auto_route": true,
+            "strict_route": true,
+            "endpoint_independent_nat": true,
+            "stack": "mixed",
+            "mtu": 1500
+        },
+        {
+            "type": "socks",
+            "tag": "socks-in",
+            "listen": "127.0.0.1",
+            "listen_port": 2333
+        },
+        {
+            "type": "mixed",
+            "tag": "mixed-in",
+            "listen": "127.0.0.1",
+            "listen_port": 2334
+        }
+    ],
+    "outbounds": [
+        {
+            "tag": "节点选择",
+            "type": "selector",
+            "default": "自动选择",
+            "outbounds": [
+                "自动选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "🇬🇧 英国聚合",
+                "🇩🇪 德国聚合",
+                "🇳🇱 荷兰聚合",
+                "🇦🇺 澳大利亚聚合",
+                "🇨🇦 加拿大聚合"
+            ]
+        },
+        {
+            "tag": "自动选择",
+            "type": "urltest",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50,
+            "outbounds": []
+        },
+        {
+            "tag": "YouTube",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "🇬🇧 英国聚合",
+                "🇩🇪 德国聚合",
+                "🇳🇱 荷兰聚合"
+            ]
+        },
+        {
+            "tag": "流媒体",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "🇬🇧 英国聚合",
+                "🇩🇪 德国聚合",
+                "🇳🇱 荷兰聚合",
+                "🇦🇺 澳大利亚聚合"
+            ]
+        },
+        {
+            "tag": "TikTok",
+            "type": "selector",
+            "default": "🇯🇵 日本聚合",
+            "outbounds": [
+                "🇯🇵 日本聚合",
+                "🇺🇸 美国聚合",
+                "🇰🇷 韩国聚合",
+                "🇹🇼 台湾聚合",
+                "🇸🇬 新加坡聚合",
+                "节点选择"
+            ]
+        },
+        {
+            "tag": "AI",
+            "type": "selector",
+            "default": "🇹🇼 台湾聚合",
+            "outbounds": [
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇺🇸 美国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇬🇧 英国聚合",
+                "🇩🇪 德国聚合",
+                "🇳🇱 荷兰聚合",
+                "🇰🇷 韩国聚合",
+                "🇨🇦 加拿大聚合",
+                "🇦🇺 澳大利亚聚合",
+                "节点选择"
+            ]
+        },
+        {
+            "tag": "Google",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合"
+            ]
+        },
+        {
+            "tag": "Telegram",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "🇯🇵 日本聚合",
+                "🇩🇪 德国聚合"
+            ]
+        },
+        {
+            "tag": "社交媒体",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "🇬🇧 英国聚合"
+            ]
+        },
+        {
+            "tag": "GitHub",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇯🇵 日本聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合",
+                "direct"
+            ]
+        },
+        {
+            "tag": "游戏平台",
+            "type": "selector",
+            "default": "direct",
+            "outbounds": [
+                "direct",
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇹🇼 台湾聚合",
+                "🇯🇵 日本聚合",
+                "🇰🇷 韩国聚合",
+                "🇸🇬 新加坡聚合",
+                "🇺🇸 美国聚合"
+            ]
+        },
+        {
+            "tag": "兜底分流",
+            "type": "selector",
+            "default": "节点选择",
+            "outbounds": [
+                "节点选择",
+                "🇭🇰 香港聚合",
+                "🇺🇸 美国聚合",
+                "🇯🇵 日本聚合",
+                "🇸🇬 新加坡聚合",
+                "direct"
+            ],
+            "include": "(?!)"
+        },
+        {
+            "type": "urltest",
+            "tag": "🇭🇰 香港聚合",
+            "outbounds": [],
+            "include": "(?i)(🇭🇰|香港|Hong.?Kong|Hong|(^|[^A-Za-z])HK([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇹🇼 台湾聚合",
+            "outbounds": [],
+            "include": "(?i)(🇹🇼|台湾|台灣|Taiwan|Taipei|(^|[^A-Za-z])TW([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇯🇵 日本聚合",
+            "outbounds": [],
+            "include": "(?i)(🇯🇵|日本|Japan|Tokyo|Osaka|东京|大阪|(^|[^A-Za-z])JP([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇰🇷 韩国聚合",
+            "outbounds": [],
+            "include": "(?i)(🇰🇷|韩国|韓國|Korea|Seoul|首尔|(^|[^A-Za-z])KR([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇸🇬 新加坡聚合",
+            "outbounds": [],
+            "include": "(?i)(🇸🇬|新加坡|狮城|Singapore|(^|[^A-Za-z])SG([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇺🇸 美国聚合",
+            "outbounds": [],
+            "include": "(?i)^(?!.*AI).*(🇺🇸|美国|美國|United.?States|America|Los.?Angeles|San.?Jose|Seattle|Chicago|Dallas|(^|[^A-Za-z])USA?([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50,
+            "exclude": "(?i)AI"
+        },
+        {
+            "type": "urltest",
+            "tag": "🇬🇧 英国聚合",
+            "outbounds": [],
+            "include": "(?i)(🇬🇧|英国|英國|United.?Kingdom|Britain|England|London|伦敦|UK)",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇩🇪 德国聚合",
+            "outbounds": [],
+            "include": "(?i)(🇩🇪|德国|德國|Germany|Frankfurt|Berlin|法兰克福|柏林|(^|[^A-Za-z])DE([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇦🇺 澳大利亚聚合",
+            "outbounds": [],
+            "include": "(?i)(🇦🇺|澳大利亚|澳洲|Australia|Sydney|Melbourne|悉尼|墨尔本|(^|[^A-Za-z])AU([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇨🇦 加拿大聚合",
+            "outbounds": [],
+            "include": "(?i)(🇨🇦|加拿大|Canada|Toronto|Vancouver|Montreal|多伦多|温哥华|(^|[^A-Za-z])CA([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "type": "urltest",
+            "tag": "🇳🇱 荷兰聚合",
+            "outbounds": [],
+            "include": "(?i)(🇳🇱|荷兰|荷蘭|Netherlands|Nederland|Amsterdam|阿姆斯特丹|(^|[^A-Za-z])NL([^A-Za-z]|$))",
+            "url": "https://cp.cloudflare.com/generate_204",
+            "interval": "2m",
+            "tolerance": 50
+        },
+        {
+            "tag": "direct",
+            "type": "direct"
+        }
+    ],
+    "route": {
+        "auto_detect_interface": true,
+        "rules": [
+            {
+                "action": "hijack-dns",
+                "protocol": "dns"
+            },
+            {
+                "action": "sniff",
+                "timeout": "300ms"
+            },
+            {
+                "clash_mode": "direct",
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "clash_mode": "global",
+                "action": "route",
+                "outbound": "节点选择"
+            },
+            {
+                "ip_is_private": true,
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "ads"
+                ],
+                "action": "reject"
+            },
+            {
+                "rule_set": [
+                    "openai"
+                ],
+                "action": "route",
+                "outbound": "AI"
+            },
+            {
+                "domain_suffix": [
+                    "anthropic.com",
+                    "claude.ai",
+                    "gemini.google.com",
+                    "bard.google.com",
+                    "ai.google.dev",
+                    "generativelanguage.googleapis.com",
+                    "aistudio.google.com",
+                    "copilot.microsoft.com",
+                    "sydney.bing.com",
+                    "perplexity.ai",
+                    "poe.com",
+                    "sora.com",
+                    "grok.com",
+                    "x.ai",
+                    "meta.ai",
+                    "huggingface.co",
+                    "replicate.com",
+                    "midjourney.com",
+                    "stability.ai",
+                    "runway.com",
+                    "runwayml.com",
+                    "mistral.ai",
+                    "cohere.com",
+                    "together.ai",
+                    "groq.com",
+                    "fireworks.ai",
+                    "chatgpt.com",
+                    "cursor.com",
+                    "cursor.sh",
+                    "codeium.com",
+                    "windsurf.com",
+                    "bolt.new",
+                    "v0.dev",
+                    "replit.com",
+                    "replit.dev",
+                    "vercel.ai",
+                    "claude.site",
+                    "notebooklm.google",
+                    "suno.ai",
+                    "suno.com",
+                    "udio.com",
+                    "devin.ai",
+                    "cognition.ai",
+                    "lovable.dev",
+                    "labs.google",
+                    "lmsys.org",
+                    "dify.ai",
+                    "coze.com",
+                    "character.ai",
+                    "jasper.ai",
+                    "elevenlabs.io",
+                    "heygen.com",
+                    "synthesia.io"
+                ],
+                "action": "route",
+                "outbound": "AI"
+            },
+            {
+                "domain_suffix": [
+                    "deepseek.com"
+                ],
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "bing"
+                ],
+                "action": "route",
+                "outbound": "Google"
+            },
+            {
+                "rule_set": [
+                    "apple"
+                ],
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "_comment": "Microsoft 国际版 inline 关键域名兜底 — 外部 rule-set 拉不到时仍 cover OneDrive/Outlook/Teams/365",
+                "domain_suffix": [
+                    "login.microsoftonline.com",
+                    "login.microsoft.com",
+                    "login.live.com",
+                    "microsoftonline.com",
+                    "microsoftonline-p.com",
+                    "msauth.net",
+                    "msftauth.net",
+                    "msidentity.com",
+                    "account.live.com",
+                    "graph.microsoft.com",
+                    "onedrive.com",
+                    "onedrive.live.com",
+                    "1drv.com",
+                    "1drv.ms",
+                    "livefilestore.com",
+                    "storage.live.com",
+                    "sharepoint.com",
+                    "sharepointonline.com",
+                    "svc.ms",
+                    "outlook.com",
+                    "outlook.office.com",
+                    "outlook.office365.com",
+                    "outlookmobile.com",
+                    "protection.outlook.com",
+                    "teams.microsoft.com",
+                    "teams.cloud.microsoft",
+                    "teams.live.com",
+                    "lync.com",
+                    "skype.com",
+                    "skypeassets.com",
+                    "office.com",
+                    "office.net",
+                    "office365.com",
+                    "officeapps.live.com",
+                    "microsoft365.com",
+                    "onenote.com",
+                    "onenote.net",
+                    "cloud.microsoft",
+                    "static.microsoft",
+                    "usercontent.microsoft",
+                    "azure.com",
+                    "azure.net",
+                    "admin.microsoft.com"
+                ],
+                "action": "route",
+                "outbound": "节点选择"
+            },
+            {
+                "_comment": "Microsoft 21Vianet 中国版强制直连",
+                "domain_suffix": [
+                    "partner.microsoftonline.cn",
+                    "office365.cn",
+                    "sharepoint.cn",
+                    "microsoftonline.cn"
+                ],
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "_comment": "Microsoft Optimize 类 IP CIDR",
+                "ip_cidr": [
+                    "13.107.128.0/22",
+                    "40.96.0.0/13",
+                    "40.104.0.0/15",
+                    "52.96.0.0/14",
+                    "52.104.0.0/14",
+                    "52.112.0.0/14",
+                    "52.122.0.0/15",
+                    "104.146.128.0/17",
+                    "150.171.32.0/22"
+                ],
+                "action": "route",
+                "outbound": "节点选择"
+            },
+            {
+                "rule_set": [
+                    "microsoft"
+                ],
+                "action": "route",
+                "outbound": "节点选择"
+            },
+            {
+                "rule_set": [
+                    "youtube"
+                ],
+                "action": "route",
+                "outbound": "YouTube"
+            },
+            {
+                "rule_set": [
+                    "netflix",
+                    "disney",
+                    "spotify",
+                    "twitch",
+                    "bahamut",
+                    "primevideo",
+                    "hbo"
+                ],
+                "action": "route",
+                "outbound": "流媒体"
+            },
+            {
+                "domain_keyword": [
+                    "emby",
+                    "jellyfin"
+                ],
+                "outbound": "流媒体",
+                "action": "route"
+            },
+            {
+                "rule_set": [
+                    "bilibili",
+                    "chinamedia"
+                ],
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "globalmedia"
+                ],
+                "action": "route",
+                "outbound": "流媒体"
+            },
+            {
+                "rule_set": [
+                    "tiktok"
+                ],
+                "action": "route",
+                "outbound": "TikTok"
+            },
+            {
+                "rule_set": [
+                    "google"
+                ],
+                "action": "route",
+                "outbound": "Google"
+            },
+            {
+                "rule_set": [
+                    "telegram"
+                ],
+                "action": "route",
+                "outbound": "Telegram"
+            },
+            {
+                "rule_set": [
+                    "twitter",
+                    "facebook",
+                    "instagram",
+                    "discord",
+                    "whatsapp",
+                    "line",
+                    "reddit",
+                    "linkedin"
+                ],
+                "action": "route",
+                "outbound": "社交媒体"
+            },
+            {
+                "domain_suffix": [
+                    "threads.net",
+                    "bsky.app",
+                    "bsky.social",
+                    "mastodon.social",
+                    "misskey.io"
+                ],
+                "action": "route",
+                "outbound": "社交媒体"
+            },
+            {
+                "domain_keyword": [
+                    "mastodon"
+                ],
+                "outbound": "社交媒体",
+                "action": "route"
+            },
+            {
+                "rule_set": [
+                    "github"
+                ],
+                "action": "route",
+                "outbound": "GitHub"
+            },
+            {
+                "rule_set": [
+                    "steam",
+                    "epicgames",
+                    "category-games"
+                ],
+                "action": "route",
+                "outbound": "游戏平台"
+            },
+            {
+                "domain_suffix": [
+                    "zoom.us",
+                    "zoom.com",
+                    "zoomgov.com",
+                    "slack.com",
+                    "slack-edge.com",
+                    "notion.so",
+                    "notion-static.com",
+                    "figma.com",
+                    "atlassian.com",
+                    "atlassian.net",
+                    "jira.com",
+                    "trello.com",
+                    "salesforce.com",
+                    "force.com"
+                ],
+                "action": "route",
+                "outbound": "节点选择"
+            },
+            {
+                "rule_set": [
+                    "amazon"
+                ],
+                "action": "route",
+                "outbound": "兜底分流"
+            },
+            {
+                "domain_suffix": [
+                    "shopify.com",
+                    "myshopify.com",
+                    "paypal.com",
+                    "stripe.com"
+                ],
+                "action": "route",
+                "outbound": "兜底分流"
+            },
+            {
+                "action": "resolve",
+                "strategy": "prefer_ipv4"
+            },
+            {
+                "rule_set": [
+                    "cn",
+                    "cnip"
+                ],
+                "action": "route",
+                "outbound": "direct"
+            },
+            {
+                "rule_set": [
+                    "notcn"
+                ],
+                "action": "route",
+                "outbound": "节点选择"
+            }
+        ],
+        "rule_set": [
+            {
+                "tag": "ads",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "apple",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/apple.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "microsoft",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/microsoft.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "bing",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/bing.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "amazon",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/amazon.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "openai",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/openai.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "youtube",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/youtube.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "netflix",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/netflix.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "disney",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/disney.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "spotify",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/spotify.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "twitch",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/twitch.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "bahamut",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/bahamut.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "primevideo",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/primevideo.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "hbo",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/hbo.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "tiktok",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/tiktok.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "bilibili",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/bilibili.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "chinamedia",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-media-cn.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "globalmedia",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-media.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "telegram",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/telegram.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "twitter",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/twitter.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "facebook",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/facebook.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "instagram",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/instagram.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "discord",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/discord.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "whatsapp",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/whatsapp.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "line",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/line.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "reddit",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/reddit.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "linkedin",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/linkedin.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "google",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/google.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "github",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/github.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "steam",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/steam.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "epicgames",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/epicgames.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "category-games",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-games.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "cnip",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "notcn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+                "download_detour": "direct"
+            }
+        ],
+        "final": "兜底分流",
+        "default_domain_resolver": "local-ali"
+    }
+}

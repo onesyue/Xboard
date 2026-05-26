@@ -72,14 +72,15 @@ if service_running web; then
     && ok "Portal app-core asset" || fail "Portal app-core asset missing"
   docker compose exec -T web test -s /www/public/assets/u/ux-state.js >/dev/null 2>&1 \
     && ok "Portal ux-state asset" || fail "Portal ux-state asset missing"
-  docker compose exec -T web grep -Fq "portal-auth-route" /www/storage/theme/Portal/dashboard.blade.php >/dev/null 2>&1 \
+  docker compose exec -T web grep -Fq "portal-auth-contrast-fix" /www/storage/theme/Portal/dashboard.blade.php >/dev/null 2>&1 \
     && ok "Portal auth hardening" || fail "Portal auth hardening missing"
 
+  # tmpfs-safe: docker cp cannot write into tmpfs mount (moby#22020 by-design)
   docker compose exec -T web rm -rf /tmp/xboard-templates-check >/dev/null
   docker compose exec -T web mkdir -p /tmp/xboard-templates-check >/dev/null
   for f in xboard-templates/*.{json,yaml,conf}; do
     [ -f "$f" ] || continue
-    docker compose cp "$f" "web:/tmp/xboard-templates-check/$(basename "$f")" >/dev/null
+    cat "$f" | docker compose exec -T web sh -c "cat > /tmp/xboard-templates-check/$(basename "$f")"
   done
   if docker compose exec -T web php <<'PHP' >/tmp/yue-template-check.out 2>&1
 <?php

@@ -401,8 +401,8 @@ if source_patches_needed; then
   bash patch-pgsql-stability.sh
 
   echo '=== Step 5.6: Inject xb_server_id into ClashMeta subscription ==='
-  docker cp patch-classmeta-xbid.sh yue-to-web-1:/tmp/patch-classmeta-xbid.sh
-  docker compose exec -T web sh /tmp/patch-classmeta-xbid.sh
+  # tmpfs-safe: docker cp cannot write into a tmpfs mount (moby#22020 by-design)
+  cat patch-classmeta-xbid.sh | docker exec -i yue-to-web-1 sh -c "cat > /tmp/patch-classmeta-xbid.sh && sh /tmp/patch-classmeta-xbid.sh" 
 
   echo '=== Step 5.65: Patch CommissionTier invite display hook ==='
   docker cp patch-commission-tier-hook.php yue-to-web-1:/www/patch-commission-tier-hook.php
