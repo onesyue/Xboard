@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Redis;
 class DeviceStateService
 {
     private const PREFIX = 'user_devices:';
-    private const TTL = 300;                     // device state ttl
-    private const DB_THROTTLE = 10;             // update db throttle
+    private const TTL = 180;                     // device state ttl (must match node-side idle reaper)
+    private const DB_THROTTLE = 30;             // update db throttle (writes to v2_user.online_count)
 
     /**
      * 移除 Redis key 的前缀
@@ -193,8 +193,8 @@ class DeviceStateService
     {
         $dbThrottleKey = "device:db_throttle:{$userId}";
 
-        // if (Redis::setnx($dbThrottleKey, 1)) {
-        //     Redis::expire($dbThrottleKey, self::DB_THROTTLE);
+        if (Redis::setnx($dbThrottleKey, 1)) {
+            Redis::expire($dbThrottleKey, self::DB_THROTTLE);
 
             User::query()
                 ->whereKey($userId)
@@ -202,6 +202,6 @@ class DeviceStateService
                     'online_count' => $this->getDeviceCount($userId),
                     'last_online_at' => now(),
                 ]);
-        // }
+        }
     }
 }

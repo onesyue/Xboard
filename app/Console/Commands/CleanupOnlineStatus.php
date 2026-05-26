@@ -15,7 +15,7 @@ class CleanupOnlineStatus extends Command
     {
         $affected = User::where('online_count', '>', 0)
             ->where(function ($query) {
-                $query->where('last_online_at', '<', now()->subMinutes(10))
+                $query->where('last_online_at', '<', now()->subMinutes(3))
                     ->orWhereNull('last_online_at');
             })
             ->update(['online_count' => 0]);
