@@ -221,6 +221,28 @@ class ClashMeta extends AbstractProtocol
         $config['proxy-groups'] = array_filter($config['proxy-groups'], function ($group) {
             return $group['proxies'];
         });
+        // P0b 修复 (2026-05-25): array_filter 删空组后清理悬空引用
+        // 用户套餐没有某地区节点 → 聚合组 "悦 · 🇭🇰 香港聚合" 被过滤 →
+        // 但 "悦 · 故障转移" / "$app_name" / "YouTube" 仍引用其名字 →
+        // mihomo 解析 "proxy group not found" → startCore E006 失败
+        // (telemetry: 30d 50 条 startup_fail 中 45 条为此根因)
+        $existingGroupNames = array_column($config['proxy-groups'], 'name');
+        $builtIns = ['DIRECT', 'REJECT', 'PASS', 'GLOBAL'];
+        foreach ($config['proxy-groups'] as $k => $group) {
+            if (empty($group['proxies']) || !is_array($group['proxies'])) continue;
+            $config['proxy-groups'][$k]['proxies'] = array_values(array_filter(
+                $group['proxies'],
+                function ($p) use ($existingGroupNames, $proxies, $builtIns) {
+                    if (in_array($p, $proxies, true)) return true;
+                    if (in_array($p, $existingGroupNames, true)) return true;
+                    if (in_array($p, $builtIns, true)) return true;
+                    return false;
+                }
+            ));
+        }
+        $config['proxy-groups'] = array_filter($config['proxy-groups'], function ($g) {
+            return !empty($g['proxies']);
+        });
         $config['proxy-groups'] = array_values($config['proxy-groups']);
         $config = $this->buildRules($config);
 
