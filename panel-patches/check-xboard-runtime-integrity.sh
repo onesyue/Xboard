@@ -75,18 +75,20 @@ if service_running web; then
   docker compose exec -T web grep -Fq "portal-auth-contrast-fix" /www/storage/theme/Portal/dashboard.blade.php >/dev/null 2>&1 \
     && ok "Portal auth hardening" || fail "Portal auth hardening missing"
 
-  docker compose exec -T web rm -rf /tmp/xboard-templates-check >/dev/null
-  docker compose exec -T web mkdir -p /tmp/xboard-templates-check >/dev/null
+  # 2026-05-27: /tmp 是 tmpfs (compose 里 size=512m)，docker compose cp 不可靠 → 改 storage/ 持久路径
+  TPL_CHECK_DIR=/www/storage/framework/cache/yueops-tpl-check
+  docker compose exec -T web rm -rf "$TPL_CHECK_DIR" >/dev/null
+  docker compose exec -T web mkdir -p "$TPL_CHECK_DIR" >/dev/null
   for f in xboard-templates/*.{json,yaml,conf}; do
     [ -f "$f" ] || continue
-    docker compose cp "$f" "web:/tmp/xboard-templates-check/$(basename "$f")" >/dev/null
+    docker compose cp "$f" "web:$TPL_CHECK_DIR/$(basename "$f")" >/dev/null
   done
-  if docker compose exec -T web php <<'PHP' >/tmp/yue-template-check.out 2>&1
+  if docker compose exec -T web php <<PHP >/tmp/yue-template-check.out 2>&1
 <?php
 require "/www/vendor/autoload.php";
-$app = require "/www/bootstrap/app.php";
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-$plan = [
+\$app = require "/www/bootstrap/app.php";
+\$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();
+\$plan = [
   'singbox' => 'singbox.json',
   'clashmeta' => 'clashmeta.yaml',
   'clash' => 'clash.yaml',
@@ -94,16 +96,16 @@ $plan = [
   'surge' => 'surge.conf',
   'surfboard' => 'surfboard.conf',
 ];
-$bad = [];
-foreach ($plan as $name => $file) {
-  $tmpPath = "/tmp/xboard-templates-check/$file";
-  if (!is_file($tmpPath)) { $bad[] = "$name:tmp-missing"; continue; }
-  $db = DB::table('v2_subscribe_templates')->where('name', $name)->value('content');
-  if ($db === null) { $bad[] = "$name:db-missing"; continue; }
-  if (md5_file($tmpPath) !== md5($db)) { $bad[] = "$name:md5-drift"; }
+\$bad = [];
+foreach (\$plan as \$name => \$file) {
+  \$tmpPath = "${TPL_CHECK_DIR}/\$file";
+  if (!is_file(\$tmpPath)) { \$bad[] = "\$name:tmp-missing"; continue; }
+  \$db = DB::table('v2_subscribe_templates')->where('name', \$name)->value('content');
+  if (\$db === null) { \$bad[] = "\$name:db-missing"; continue; }
+  if (md5_file(\$tmpPath) !== md5(\$db)) { \$bad[] = "\$name:md5-drift"; }
 }
-if ($bad) { echo implode("\n", $bad), "\n"; exit(1); }
-echo "templates OK\n";
+if (\$bad) { echo implode("\\n", \$bad), "\\n"; exit(1); }
+echo "templates OK\\n";
 PHP
   then
     ok "subscribe templates DB sync"
