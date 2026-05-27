@@ -11,7 +11,7 @@
 | VIP4 铂金 | ¥2000 | 42% | 3% |
 | VIP5 钻石 | ¥4000 | **50%** | 2% |
 
-阈值为本季度（90d 滚动）通过 `v2_order` 累计已完成邀请订单成交额（`total_amount + balance_amount`）。
+阈值为本季度（90d 滚动）通过 `v2_order` 累计已完成邀请订单**网关实付**（`total_amount`，不含余额抵扣，2026-05-27 policy）。
 
 ## 工作机制
 
@@ -70,10 +70,6 @@ docker exec yue-to-web-1 php /www/artisan commission-tier:recompute --dry
 
 # 立即重算
 docker exec yue-to-web-1 php /www/artisan commission-tier:recompute
-
-# 修复 v1.0.0 余额抵扣订单返佣基数（先 dry-run，再 apply）
-docker exec yue-to-web-1 php /www/artisan commission-tier:repair-balance-commissions --include-paid
-docker exec yue-to-web-1 php /www/artisan commission-tier:repair-balance-commissions --include-paid --apply
 
 # 用户查询
 curl -H "Authorization: Bearer $TOKEN" https://panel/api/v1/user/commission/tier
