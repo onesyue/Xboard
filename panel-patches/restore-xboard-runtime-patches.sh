@@ -1,9 +1,5 @@
 #!/bin/bash
 # Re-apply Yue.to XBoard runtime patches after image/container recreation.
-# 2026-05-26: all docker cp into container were rewritten to stdin redirect
-# (docker 29.x has a known incompatibility with tmpfs mounts that makes
-# `docker cp` silently produce 'Could not find the file' inside the mount;
-# stdin redirect via `docker exec -i ... cat > ...` is cross-version safe).
 # Idempotent: cheap marker check first; only runs heavy patch sequence when a marker is missing.
 set -Eeuo pipefail
 cd /home/xboard/yue-to
@@ -77,7 +73,7 @@ fi
 
 if ! docker compose exec -T web grep -Fq "portal-auth-contrast-fix" /www/storage/theme/Portal/dashboard.blade.php >/dev/null 2>&1; then
   need_restore=1
-  log "missing markers: web:Portal harden-contrast marker"
+  log "missing markers: web:Portal auth hardening"
 fi
 
 if [ "$need_restore" = "0" ]; then
@@ -92,11 +88,13 @@ bash ./patch-security.sh
 bash ./patch-pgsql-stability.sh
 
 if [ -f ./patch-classmeta-xbid.sh ]; then
-  cat patch-classmeta-xbid.sh | docker exec -i yue-to-web-1 sh -c "cat > /tmp/patch-classmeta-xbid.sh && sh /tmp/patch-classmeta-xbid.sh"
+  docker cp patch-classmeta-xbid.sh yue-to-web-1:/tmp/patch-classmeta-xbid.sh
+  docker compose exec -T web sh /tmp/patch-classmeta-xbid.sh
 fi
 
 if [ -f ./patch-clashmeta-dangling-ref.sh ]; then
-  cat patch-clashmeta-dangling-ref.sh | docker exec -i yue-to-web-1 sh -c "cat > /tmp/patch-clashmeta-dangling-ref.sh && sh /tmp/patch-clashmeta-dangling-ref.sh"
+  docker cp patch-clashmeta-dangling-ref.sh yue-to-web-1:/tmp/patch-clashmeta-dangling-ref.sh
+  docker compose exec -T web sh /tmp/patch-clashmeta-dangling-ref.sh
 fi
 
 
@@ -105,11 +103,13 @@ if [ -f ./patch-loon-upload-bandwidth.sh ]; then
 fi
 
 if [ -f ./patch-reset-disconnect.php ]; then
-  cat patch-reset-disconnect.php | docker exec -i yue-to-web-1 sh -c "cat > /www/patch-reset-disconnect.php && php /www/patch-reset-disconnect.php"
+  docker cp patch-reset-disconnect.php yue-to-web-1:/www/patch-reset-disconnect.php
+  docker compose exec -T web php /www/patch-reset-disconnect.php
 fi
 
 if [ -f ./patch-online-stats-v2.php ]; then
-  cat patch-online-stats-v2.php | docker exec -i yue-to-web-1 sh -c "cat > /www/patch-online-stats-v2.php && php /www/patch-online-stats-v2.php"
+  docker cp patch-online-stats-v2.php yue-to-web-1:/www/patch-online-stats-v2.php
+  docker compose exec -T web php /www/patch-online-stats-v2.php
 fi
 
 if [ -f ./patch-subscribe-templates.sh ]; then
