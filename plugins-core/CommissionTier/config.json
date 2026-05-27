@@ -1,0 +1,61 @@
+{
+    "name": "邀请返利 VIP 等级",
+    "code": "commission_tier",
+    "version": "1.0.0",
+    "type": "feature",
+    "description": "按滚动 90 天邀请成交额自动计算普通档 + 5 档 VIP 返利比例，覆盖默认邀请返利，支持升降档 Telegram 通知。",
+    "author": "YueLink",
+    "require": {
+        "xboard": ">=1.0.0"
+    },
+    "config": {
+        "enabled": {
+            "type": "boolean",
+            "default": true,
+            "label": "启用 VIP 等级",
+            "description": "关闭后所有订单回退到 admin_setting('invite_commission') 默认值"
+        },
+        "window_days": {
+            "type": "string",
+            "default": "90",
+            "label": "滚动窗口天数",
+            "description": "向前累计多少天的返利计算 tier，主流 90 (季度) / 180 (半年)"
+        },
+        "demote_grace_days": {
+            "type": "string",
+            "default": "7",
+            "label": "降档缓冲天数（保留字段）",
+            "description": "当前等级与返利率已改为按滚动窗口成交实时判定；该字段仅保留兼容旧配置"
+        },
+        "tiers_json": {
+            "type": "string",
+            "default": "[{\"level\":0,\"name\":\"普通\",\"threshold\":0,\"rate\":10,\"badge\":\"—\",\"color\":\"#9ca3af\"},{\"level\":1,\"name\":\"VIP1\",\"threshold\":20000,\"rate\":18,\"badge\":\"青铜\",\"color\":\"#cd7f32\"},{\"level\":2,\"name\":\"VIP2\",\"threshold\":50000,\"rate\":26,\"badge\":\"白银\",\"color\":\"#c0c0c0\"},{\"level\":3,\"name\":\"VIP3\",\"threshold\":100000,\"rate\":35,\"badge\":\"黄金\",\"color\":\"#fbbf24\"},{\"level\":4,\"name\":\"VIP4\",\"threshold\":200000,\"rate\":42,\"badge\":\"铂金\",\"color\":\"#67e8f9\"},{\"level\":5,\"name\":\"VIP5\",\"threshold\":400000,\"rate\":50,\"badge\":\"钻石\",\"color\":\"#a78bfa\"}]",
+            "label": "Tier 配置 (JSON)",
+            "description": "数组格式，threshold 单位分，按滚动窗口邀请成交额 GMV 判定，rate 0-100。修改后立即生效；保留 level=0 作 baseline"
+        },
+        "dry_run": {
+            "type": "boolean",
+            "default": false,
+            "label": "Dry-run 模式",
+            "description": "只算 tier 不覆写 order.commission_balance，用于上线前观察"
+        },
+        "telegram_notify": {
+            "type": "boolean",
+            "default": true,
+            "label": "Telegram 升降档推送",
+            "description": "通过 yue bot 通知 inviter，需配置下方 bot token + group id"
+        },
+        "telegram_bot_token": {
+            "type": "string",
+            "default": "",
+            "label": "Telegram Bot Token",
+            "description": "复用 yue bot 的 BOT_TOKEN（/opt/telegram-bot/yue/.env），仅 admin 可见"
+        },
+        "telegram_group_id": {
+            "type": "string",
+            "default": "",
+            "label": "Telegram 群播 ID",
+            "description": "L4/L5 升档群播目标，留空则不群播"
+        }
+    }
+}

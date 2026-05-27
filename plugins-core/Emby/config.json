@@ -1,0 +1,49 @@
+{
+    "name": "Emby 媒体服务",
+    "code": "emby",
+    "version": "1.0.0",
+    "type": "feature",
+    "description": "为有效订阅用户自动创建 Emby 账号，生成一键登录链接，并按订阅状态同步启停访问权限。",
+    "author": "YueLink",
+    "require": {
+        "xboard": ">=1.0.0"
+    },
+    "config": {
+        "enabled": {
+            "type": "boolean",
+            "default": true,
+            "label": "启用 Emby 集成",
+            "description": "是否为订阅用户提供 Emby 访问"
+        },
+        "emby_host": {
+            "type": "string",
+            "default": "https://emby.yue.to",
+            "label": "Emby 服务器地址",
+            "description": "Emby 服务器公网地址（无尾部斜杠）"
+        },
+        "emby_api_key": {
+            "type": "string",
+            "default": "",
+            "label": "Emby 管理员 API Key",
+            "description": "Emby 后台 API Keys 中创建的管理员 Key，生产值保存在插件配置表中"
+        },
+        "emby_server_id": {
+            "type": "string",
+            "default": "",
+            "label": "Emby 服务器 ID",
+            "description": "Emby 后台仪表盘关于页中的服务器 ID，留空时只返回普通入口"
+        },
+        "require_subscription": {
+            "type": "boolean",
+            "default": false,
+            "label": "需要有效订阅",
+            "description": "开启后无订阅或订阅过期的用户无法获取 Emby 链接"
+        },
+        "max_streams": {
+            "type": "string",
+            "default": "2",
+            "label": "最大并发流数",
+            "description": "每个 Emby 用户允许的最大同时播放数"
+        }
+    }
+}

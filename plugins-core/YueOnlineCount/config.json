@@ -1,0 +1,12 @@
+{
+    "name": "在线设备统计增强",
+    "code": "yue_online_count",
+    "version": "1.0.0",
+    "type": "feature",
+    "description": "为订阅接口补齐 online_count 与 last_online_at，并按 10 分钟活跃窗口过滤过期在线数，保持面板和机器人口径一致。",
+    "author": "YueLink",
+    "require": {
+        "xboard": ">=1.0.0"
+    },
+    "config": {}
+}

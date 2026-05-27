@@ -1,0 +1,175 @@
+{
+    "name": "邀请别名 (自定义邀请码 + 子域名)",
+    "code": "invite_alias",
+    "version": "1.0.0",
+    "type": "feature",
+    "description": "用户用积分兑换永久专属推广链接：888 自定义邀请码 / 1888 隔离子域 *.i.yue.to / 8888 主域子域 *.yue.to。全自助审核，立即激活，事后监控兜底。",
+    "author": "YueLink",
+    "require": {
+        "xboard": ">=1.0.0"
+    },
+    "config": {
+        "enabled": {
+            "type": "boolean",
+            "default": true,
+            "label": "启用别名兑换",
+            "description": "关闭后所有兑换接口返回 404，已激活别名仍可解析"
+        },
+        "price_invite_code": {
+            "type": "string",
+            "default": "888",
+            "label": "邀请码价格 (积分)",
+            "description": "?aff=demo 自定义邀请码，扣 user_account.gambling_points"
+        },
+        "price_subdomain_isolated": {
+            "type": "string",
+            "default": "1888",
+            "label": "i.yue.to 隔离子域价格",
+            "description": "demo.i.yue.to —— 主力产品档"
+        },
+        "price_subdomain_brand": {
+            "type": "string",
+            "default": "8888",
+            "label": "yue.to 主域子域价格",
+            "description": "demo.yue.to —— 北极星稀缺档"
+        },
+        "min_invite_count_isolated": {
+            "type": "string",
+            "default": "3",
+            "label": "i.yue.to 兑换门槛 (邀请人数)",
+            "description": "已成功邀请人数下限，0 = 无门槛"
+        },
+        "min_invite_count_brand": {
+            "type": "string",
+            "default": "10",
+            "label": "yue.to 主域兑换门槛 (邀请人数)",
+            "description": "需邀请 ≥N 人才能购买主域档"
+        },
+        "min_account_age_days_brand": {
+            "type": "string",
+            "default": "30",
+            "label": "yue.to 主域账号年龄门槛 (天)",
+            "description": "账号创建距今 ≥N 天才能购买主域档"
+        },
+        "alias_min_length": {
+            "type": "string",
+            "default": "3",
+            "label": "alias 最小长度",
+            "description": "字符数下限，含数字和字母"
+        },
+        "alias_max_length": {
+            "type": "string",
+            "default": "20",
+            "label": "alias 最大长度",
+            "description": "字符数上限"
+        },
+        "ai_review_enabled": {
+            "type": "boolean",
+            "default": true,
+            "label": "启用 AI 实时审核",
+            "description": "L4 层 Haiku 4.5 调用，关闭后 1888/8888 档退化为纯黑名单"
+        },
+        "ai_review_endpoint": {
+            "type": "string",
+            "default": "https://openrouter.ai/api/v1/chat/completions",
+            "label": "AI 审核 endpoint",
+            "description": "OpenRouter API URL"
+        },
+        "ai_review_model": {
+            "type": "string",
+            "default": "anthropic/claude-haiku-4.5",
+            "label": "AI 审核模型",
+            "description": "对齐主线小悦，统一 Haiku 4.5"
+        },
+        "ai_review_api_key": {
+            "type": "string",
+            "default": "",
+            "label": "OpenRouter API Key",
+            "description": "复用 yue bot 的 OPENROUTER_API_KEY"
+        },
+        "ip_register_window_days": {
+            "type": "string",
+            "default": "7",
+            "label": "同 IP 兑换窗口 (天)",
+            "description": "同一注册 IP 在窗口期内最多 N-1 个 alias，防小号囤号"
+        },
+        "ip_register_max_per_window": {
+            "type": "string",
+            "default": "2",
+            "label": "同 IP 兑换上限",
+            "description": "窗口期内同 IP 最大 alias 数"
+        },
+        "user_cooldown_days": {
+            "type": "string",
+            "default": "7",
+            "label": "用户冷却期 (天)",
+            "description": "用户两次 alias 兑换间隔下限"
+        },
+        "pending_ttl_minutes": {
+            "type": "string",
+            "default": "30",
+            "label": "Pending 状态 TTL (分钟)",
+            "description": "两阶段提交未 confirm 自动 release"
+        },
+        "dormant_after_inactive_days": {
+            "type": "string",
+            "default": "90",
+            "label": "无活跃订阅 N 天后 dormant",
+            "description": "持有者断订超过此天数，alias 进 dormant 状态（仍可访问，提示用户续订）"
+        },
+        "release_after_dormant_days": {
+            "type": "string",
+            "default": "180",
+            "label": "Dormant N 天后释放",
+            "description": "彻底回收，进 30 天冷却池后开放新人申请"
+        },
+        "release_cooldown_days": {
+            "type": "string",
+            "default": "30",
+            "label": "释放后冷却期 (天)",
+            "description": "alias 释放后 N 天内不允许被任何人申请，防止恶意抢注"
+        },
+        "ban_refund_pct_violation": {
+            "type": "string",
+            "default": "0",
+            "label": "违规 ban 退积分比例",
+            "description": "0-100，违规零退；误判恢复时全退"
+        },
+        "appeal_enabled": {
+            "type": "boolean",
+            "default": true,
+            "label": "启用 AI 自助申诉",
+            "description": "被 ban 用户可在 bot /appeal_alias 申诉，1 次机会，AI 二审"
+        },
+        "telegram_bot_token": {
+            "type": "string",
+            "default": "",
+            "label": "Telegram Bot Token",
+            "description": "复用 yue bot 的 BOT_TOKEN，用于事件通知"
+        },
+        "telegram_admin_chat_id": {
+            "type": "string",
+            "default": "",
+            "label": "管理员通知 chat_id",
+            "description": "高风险/异常事件推送目标"
+        },
+        "redis_cache_ttl_seconds": {
+            "type": "string",
+            "default": "300",
+            "label": "alias → user_id 解析缓存 TTL",
+            "description": "Laravel ResolveAliasMiddleware Redis 缓存秒数"
+        },
+        "cookie_domain": {
+            "type": "string",
+            "default": ".yue.to",
+            "label": "Cookie 作用域",
+            "description": "aff_code cookie 的 domain，跨子域共享"
+        },
+        "cookie_max_age_days": {
+            "type": "string",
+            "default": "30",
+            "label": "Cookie 有效天数",
+            "description": "用户访问子域后注册的归属窗口"
+        }
+    }
+}

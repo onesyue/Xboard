@@ -5,7 +5,11 @@
 # Note: local source `xboard-upgrade.sh` deploys as `upgrade.sh` on panel.
 
 set -uo pipefail
-: "${SSHPASS:?Set SSHPASS in environment before running sync-xboard-patches.sh}"
+if [ -r /etc/yueops-secrets.env ]; then
+  # shellcheck disable=SC1091
+  . /etc/yueops-secrets.env
+fi
+: "${SSHPASS:?FATAL: set SSHPASS or create /etc/yueops-secrets.env}"
 export SSHPASS
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -27,10 +31,12 @@ DEPLOY=(
   "patch-loon-upload-bandwidth.sh:patch-loon-upload-bandwidth.sh"
   "patch-loon-upload-bandwidth.php:patch-loon-upload-bandwidth.php"
   "patch-online-stats.php:patch-online-stats.php"
+  "patch-online-stats-v2.php:patch-online-stats-v2.php"
   "patch-balance-tracking.php:patch-balance-tracking.php"
   "patch-commission-tier-hook.php:patch-commission-tier-hook.php"
   "patch-reset-disconnect.php:patch-reset-disconnect.php"
   "patch-classmeta-xbid.sh:patch-classmeta-xbid.sh"
+  "patch-clashmeta-dangling-ref.sh:patch-clashmeta-dangling-ref.sh"
   "patch-invite-alias.sh:patch-invite-alias.sh"
   "patch-subnode-mirror-trigger.sh:patch-subnode-mirror-trigger.sh"
   "v2_server_subnode_mirror_trigger.sql:v2_server_subnode_mirror_trigger.sql"

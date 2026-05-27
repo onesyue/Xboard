@@ -1,0 +1,12 @@
+{
+  "code": "yue_client_compat",
+  "name": "客户端兼容增强",
+  "version": "1.0.1",
+  "description": "为主流订阅客户端规范化 User-Agent 与协议标识（sing-box / Clash Meta / Stash 等），按客户端版本下发匹配 schema，无需改动上游协议文件。",
+  "author": "YueLink",
+  "type": "feature",
+  "require": {
+    "xboard": ">=1.0.0"
+  },
+  "config": {}
+}
