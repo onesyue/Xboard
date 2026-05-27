@@ -154,6 +154,11 @@ dns:
     "+.claude.ai,+.anthropic.com,+.openai.com,+.chatgpt.com,+.cursor.com,+.cursor.sh,+.x.ai,+.grok.com,+.poe.com,+.perplexity.ai,+.huggingface.co,+.cohere.com,+.mistral.ai,+.together.ai,+.groq.com,+.fireworks.ai,+.replicate.com,+.midjourney.com,+.stability.ai,+.runwayml.com,+.copilot.microsoft.com,+.codeium.com,+.windsurf.com,+.bolt.new,+.v0.dev,+.replit.com,+.replit.dev,+.vercel.ai,+.gemini.google.com,+.bard.google.com,+.aistudio.google.com,+.ai.google.dev,+.generativelanguage.googleapis.com,+.meta.ai,+.sora.com":
       - "https://cloudflare-dns.com/dns-query"
       - "https://dns.google/dns-query"
+    # 2026-05-26: e-hentai/exhentai 图片走 *.hath.network (H@H 节点), 国内 DOH (alidns/doh.pub)
+    # 经常 SERVFAIL 或污染 IP → 客户端拿到假 IP → 即使走代理也连不上图. 强制走海外 DOH 解析.
+    "+.hath.network,+.exhentai.org,+.e-hentai.org,+.ehgt.org":
+      - "https://cloudflare-dns.com/dns-query"
+      - "https://dns.google/dns-query"
 
   fallback:
     - "https://cloudflare-dns.com/dns-query"
@@ -952,6 +957,11 @@ rules:
   - DOMAIN-SUFFIX,udemy.com,$app_name
   - DOMAIN-SUFFIX,khanacademy.org,$app_name
   - DOMAIN-SUFFIX,arxiv.org,$app_name
+
+  # 2026-05-26: e-hentai 图片 (*.hath.network H@H 节点) + 缩略图 ehgt.org 必须显式走代理
+  # blackmatrix7 Proxy_Classical.yaml 已收 e-hentai.org/exhentai.org 主域所以不重复.
+  - DOMAIN-SUFFIX,hath.network,兜底分流
+  - DOMAIN-SUFFIX,ehgt.org,兜底分流
 
   # 跨境电商/支付
   - RULE-SET,amazon,兜底分流

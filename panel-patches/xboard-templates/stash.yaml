@@ -822,6 +822,11 @@ rules:
   - DOMAIN-SUFFIX,khanacademy.org,$app_name
   - DOMAIN-SUFFIX,arxiv.org,$app_name
 
+  # 2026-05-26: e-hentai 图片 (*.hath.network) + 缩略图 ehgt.org 必须显式走代理
+  # blackmatrix7 Proxy_Classical.yaml 已收 e-hentai.org/exhentai.org 主域不重复.
+  - DOMAIN-SUFFIX,hath.network,兜底分流
+  - DOMAIN-SUFFIX,ehgt.org,兜底分流
+
   # 跨境电商/支付
   - RULE-SET,amazon,兜底分流
   - DOMAIN-SUFFIX,shopify.com,兜底分流

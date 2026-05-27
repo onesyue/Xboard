@@ -24,9 +24,6 @@ profile:
   store-fake-ip: true
 
 sniffer:
-  # 2026-05-25 clash core (非 Meta) override-destination 全部保持 false:
-  # clash core 对 sniff override 不够稳,可能把直连节点 IP 流量错绑回域名。
-  # clashmeta/stash 模板这些字段全是 true。对齐前需先做兼容性测试。
   enable: true
   parse-pure-ip: true
   force-dns-mapping: true
@@ -898,6 +895,11 @@ rules:
   - DOMAIN-SUFFIX,udemy.com,$app_name
   - DOMAIN-SUFFIX,khanacademy.org,$app_name
   - DOMAIN-SUFFIX,arxiv.org,$app_name
+
+  # 2026-05-26: e-hentai 图片 (*.hath.network) + 缩略图 ehgt.org 必须显式走代理
+  # blackmatrix7 Proxy_Classical.yaml 已收 e-hentai.org/exhentai.org 主域不重复.
+  - DOMAIN-SUFFIX,hath.network,兜底分流
+  - DOMAIN-SUFFIX,ehgt.org,兜底分流
 
   # 跨境电商/支付
   - RULE-SET,amazon,兜底分流
