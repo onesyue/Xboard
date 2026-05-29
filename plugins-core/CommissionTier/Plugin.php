@@ -167,6 +167,45 @@ class Plugin extends AbstractPlugin
         }
 
         $svc->markDirty((int) $order->invite_user_id);
+
+        // 2026-05-29: 付款完成(order.open.after)时权威重算佣金，收口 create 时偶发的 race
+        // (部分订单佣金按含余额的原始总额计算 → 多返佣 / 全余额单 total_amount=0 也返佣)。
+        // 此时 $order->total_amount 已是最终「网关实付」。单调安全：
+        //   - 只对「本来就计佣」(commission_balance>0) 的订单纠正金额，绝不凭空创造佣金；
+        //   - 全余额单(网关实付=0)→ 佣金归 0；个人定制率用户不动。
+        $cur = (int) round((float) ($order->commission_balance ?? 0));
+        if ($cur <= 0) {
+            return;
+        }
+        $inviter = User::find($order->invite_user_id);
+        if (!$inviter) {
+            return;
+        }
+        if (!is_null($inviter->commission_rate) && $inviter->commission_rate !== '') {
+            return;
+        }
+        $tier = $svc->resolve((int) $inviter->id);
+        $correct = (int) round(((int) ($order->total_amount ?? 0)) * $tier['rate'] / 100);
+        if ($cur === $correct) {
+            return;
+        }
+        if ($cfg['dry_run']) {
+            Log::info('[CommissionTier] open-recompute dry-run', [
+                'order_id' => $order->id, 'inviter_id' => $inviter->id,
+                'tier' => $tier['level'], 'rate' => $tier['rate'],
+                'gateway_paid' => (int) ($order->total_amount ?? 0),
+                'old_commission' => $cur, 'new_commission' => $correct,
+            ]);
+            return;
+        }
+        $order->commission_balance = $correct;
+        $order->save();
+        Log::info('[CommissionTier] open-recompute override', [
+            'order_id' => $order->id, 'inviter_id' => $inviter->id,
+            'tier' => $tier['level'], 'rate' => $tier['rate'],
+            'gateway_paid' => (int) ($order->total_amount ?? 0),
+            'old' => $cur, 'new' => $correct,
+        ]);
     }
 
     /**
