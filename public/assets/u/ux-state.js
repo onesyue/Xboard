@@ -654,9 +654,11 @@
 })();
 
 /* === change-email-widget.js === */
-/* ChangeEmail Widget v1.3 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
- * v1.3: 挂载改为「修改密码」卡最近的 .n-card 前、同父插入 —— 大小/宽度/滚动
- *       与页面原生卡片对齐（不再climb 4层落进窄容器）。
+/* ChangeEmail Widget v1.4 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
+ * v1.4: 挂载与返利/专属链接卡完全同口径 —— 挂在主内容 grid 之前、grid 父容器内，
+ *       与下方 修改密码/账户余额 卡同宽同边距、左右对齐（v1.3 的 .n-card 定位在
+ *       LiquidGlass 主题里落空 → 落到顶部窄容器致错位，本版改正）。
+ * v1.3: （已废）挂载「修改密码」卡最近的 .n-card 前。
  * v1.2: 修复填表途中被状态轮询 paint() 清空输入（「还没填完就刷新」）——
  *       fetchStatus 仅在 collapsed 态重渲染。
  *
@@ -1056,20 +1058,16 @@
     var article = document.querySelector('article.flex.flex-col.flex-1.overflow-hidden') ||
                   document.querySelector('article') || document.querySelector('main');
     if (!article) return null;
-    // 插在「修改密码」卡（最近的 .n-card）前面 —— 同父、同宽、同一滚动容器，
-    // 让本卡大小/滚动与页面原生卡片对齐（参照返利等级/专属链接卡同口径）。
-    var nodes = article.querySelectorAll('.n-card,section,div');
-    for (var i = 0; i < nodes.length; i++) {
-      var t = (nodes[i].textContent || '');
-      if (/修改密码|更改密码|重置密码|Change Password/i.test(t) && t.length < 400) {
-        var card = (nodes[i].closest && nodes[i].closest('.n-card')) || nodes[i];
-        if (card && card.parentElement) return { parent: card.parentElement, before: card };
-      }
-    }
-    // 兜底：主内容 grid 之前 / 滚动区顶部（与 CT/IA 卡一致）
-    var grid = article.querySelector('div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6');
+    // 与「返利等级 / 专属链接」卡完全同口径：挂在主内容 grid 之前、grid 的父容器里，
+    // 这样与下方 修改密码/账户余额 卡同宽、同左右边距 → 完美对齐。
+    // （LiquidGlass 主题的卡不是 NaiveUI .n-card，不能靠 closest('.n-card') 定位。）
+    var grid = article.querySelector('div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6') ||
+               article.querySelector('div.grid.gap-6') ||
+               article.querySelector('div[class*="grid-cols"]');
     if (grid && grid.parentElement) return { parent: grid.parentElement, before: grid };
-    var scroll = article.querySelector('section.flex-1.overflow-y-auto');
+    // 兜底：主滚动区顶部
+    var scroll = article.querySelector('section.flex-1.overflow-y-auto section') ||
+                 article.querySelector('section.flex-1.overflow-y-auto');
     if (scroll) return { parent: scroll, before: scroll.firstChild };
     return { parent: article, before: article.firstChild };
   }
