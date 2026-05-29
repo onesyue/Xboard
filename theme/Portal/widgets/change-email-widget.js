@@ -1,4 +1,6 @@
-/* ChangeEmail Widget v1.1 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
+/* ChangeEmail Widget v1.2 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
+ * v1.2: 修复填表途中被状态轮询 paint() 清空输入（「还没填完就刷新」）——
+ *       fetchStatus 仅在 collapsed 态重渲染。
  *
  * 策略（兄弟于 invite-alias-widget / commission-tier-widget）：
  *   - 仅 #/profile 路由显示
@@ -384,7 +386,10 @@
       STATE.fetching = false; STATE.lastFetch = Date.now();
       if (res.ok && res.body && res.body.data) STATE.status = res.body.data;
       else if (res.status === 404 || res.status === 403) STATE.status = { enabled: false };
-      paint();
+      // 用户正在填表 / 已成功时绝不重渲染——否则 2s 轮询每 4s 一次 paint() 会清空
+      // 已输入的新邮箱+验证码，导致「还没填完就刷新、来不及」。仅折叠态随轮询刷新
+      // 当前邮箱/冷却提示。
+      if (STATE.mode !== 'form' && STATE.mode !== 'success') paint();
     }).catch(function () { STATE.fetching = false; });
   }
 
