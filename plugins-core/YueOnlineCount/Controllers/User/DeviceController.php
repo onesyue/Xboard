@@ -43,7 +43,7 @@ class DeviceController extends Controller
             'count'         => count($ips),
             'limit'         => $effLimit,
             'over_limit'    => $effLimit > 0 && count($ips) > $effLimit,
-            'last_online_at'=> $user->last_online_at?->timestamp,
+            'last_online_at'=> $user->last_online_at ? (is_object($user->last_online_at) ? $user->last_online_at->timestamp : (int) $user->last_online_at) : null,
         ]);
     }
 
