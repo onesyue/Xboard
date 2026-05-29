@@ -1,4 +1,6 @@
-/* ChangeEmail Widget v1.2 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
+/* ChangeEmail Widget v1.3 — 个人中心「修改登录邮箱」卡（原生级 NaiveUI 适配）
+ * v1.3: 挂载改为「修改密码」卡最近的 .n-card 前、同父插入 —— 大小/宽度/滚动
+ *       与页面原生卡片对齐（不再climb 4层落进窄容器）。
  * v1.2: 修复填表途中被状态轮询 paint() 清空输入（「还没填完就刷新」）——
  *       fetchStatus 仅在 collapsed 态重渲染。
  *
@@ -395,19 +397,25 @@
 
   /* ======== Mount target ======== */
   function findMountTarget() {
-    var main = document.querySelector('article.flex.flex-col.flex-1.overflow-hidden') ||
-               document.querySelector('main') || document.querySelector('article');
-    if (!main) return null;
-    var nodes = main.querySelectorAll('div,section,form');
+    var article = document.querySelector('article.flex.flex-col.flex-1.overflow-hidden') ||
+                  document.querySelector('article') || document.querySelector('main');
+    if (!article) return null;
+    // 插在「修改密码」卡（最近的 .n-card）前面 —— 同父、同宽、同一滚动容器，
+    // 让本卡大小/滚动与页面原生卡片对齐（参照返利等级/专属链接卡同口径）。
+    var nodes = article.querySelectorAll('.n-card,section,div');
     for (var i = 0; i < nodes.length; i++) {
       var t = (nodes[i].textContent || '');
       if (/修改密码|更改密码|重置密码|Change Password/i.test(t) && t.length < 400) {
-        var card = nodes[i], hop = 0;
-        while (card.parentElement && card.parentElement !== main && hop < 4) { card = card.parentElement; hop++; }
-        if (card.parentElement) return { parent: card.parentElement, before: card };
+        var card = (nodes[i].closest && nodes[i].closest('.n-card')) || nodes[i];
+        if (card && card.parentElement) return { parent: card.parentElement, before: card };
       }
     }
-    return { parent: main, before: main.firstChild };
+    // 兜底：主内容 grid 之前 / 滚动区顶部（与 CT/IA 卡一致）
+    var grid = article.querySelector('div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6');
+    if (grid && grid.parentElement) return { parent: grid.parentElement, before: grid };
+    var scroll = article.querySelector('section.flex-1.overflow-y-auto');
+    if (scroll) return { parent: scroll, before: scroll.firstChild };
+    return { parent: article, before: article.firstChild };
   }
 
   function ensureMounted() {
